@@ -1,0 +1,4 @@
+Compilation :
+
+Commencez par exécuter compile.bat (création du fichier CalculsDouble_modifie.java).
+Puis, compilez le fichier CalculsDouble_modifie.java avec javac (sans options).
