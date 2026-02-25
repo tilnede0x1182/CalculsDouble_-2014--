@@ -67,4 +67,11 @@ class CalculsDouble {
 // ==============================================================================
 
 	import Operations\Reconnaissance_expression\Reconnaissance_doubles_sans_parentheses.java
+	
+// ==============================================================================
+// Tests
+// ==============================================================================
+
+	import Tests\Tests.java
+
 }

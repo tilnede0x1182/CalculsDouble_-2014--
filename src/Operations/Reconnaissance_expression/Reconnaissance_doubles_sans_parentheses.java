@@ -349,15 +349,3 @@
 		String resultat = popAvecErreur(pileCalcul);
 		return convertStrInt(resultat);
 	}
-
-// ==============================================================================
-// Main
-// ==============================================================================
-
-	public static void main(String[] args) {
-		CalculsDouble calculateur = new CalculsDouble();
-		String nombre = "12.100,0";
-		aff("nombre = " + nombre);
-		Double resultatDouble = calculateur.analyseNombreDouble(nombre);
-		aff("resultat = " + resultatDouble);
-	}

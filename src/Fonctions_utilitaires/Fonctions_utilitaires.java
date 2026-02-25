@@ -113,6 +113,22 @@
 	}
 
 	/**
+	 * Convertit le CalculsDouble en valeur double.
+	 * @return Valeur numerique double.
+	 */
+	public double toDouble() {
+		String valeur = partieEntiere;
+		if (partieDecimale != null && !partieDecimale.isEmpty()) {
+			valeur += "." + partieDecimale;
+		}
+		double resultat = Double.parseDouble(valeur);
+		if (estNegatif) {
+			resultat = -resultat;
+		}
+		return resultat;
+	}
+
+	/**
 	 * Compte les occurrences d'un caractere dans une chaine.
 	 * @param chaine Chaine a analyser.
 	 * @param caractere Caractere a compter.

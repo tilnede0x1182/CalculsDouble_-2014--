@@ -32,6 +32,10 @@
 			chiffresSignificatifs++;
 		}
 		chiffresSignificatifs = validerChiffresSignificatifs(chiffresSignificatifs);
+		if (estNul(diviseur)) {
+			aff("Impossible de diviser par 0.");
+			return null;
+		}
 		CalculsDouble[] casParticulier = verifierCasParticuliers(dividende, diviseur);
 		if (casParticulier != null) {
 			return casParticulier;
@@ -64,12 +68,7 @@
 	 * @return Resultat si cas particulier, null sinon.
 	 */
 	private CalculsDouble[] verifierCasParticuliers(CalculsDouble dividende, CalculsDouble diviseur) {
-		if (diviseur.equals(new CalculsDouble(0))) {
-			aff("Impossible de diviser par 0.");
-			aff("Impossible dividing by 0.");
-			return null;
-		}
-		if (dividende.equals(new CalculsDouble(0))) {
+		if (estNul(dividende)) {
 			return creerResultatZero();
 		}
 		if (diviseur.equals(new CalculsDouble(1))) {
