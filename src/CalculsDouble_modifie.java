@@ -1697,7 +1697,7 @@ class CalculsDouble {
 	 * Compare deux chaines numeriques.
 	 * @param chaineA Premiere chaine.
 	 * @param chaineB Deuxieme chaine.
-	 * @return 1 si A > B, -1 si A < B, 0 si egal.
+	 * @return 1 si {@code A > B}, -1 si {@code A < B}, 0 si egal.
 	 */
 	public int comparerChaines(String chaineA, String chaineB) {
 		String paddedA = padGauche(chaineA, Math.max(chaineA.length(), chaineB.length()));
@@ -1706,7 +1706,7 @@ class CalculsDouble {
 	}
 
 	/**
-	 * Soustrait deux chaines numeriques (gere A < B).
+	 * Soustrait deux chaines numeriques (gere {@code A < B}).
 	 * @param chaineA Premiere chaine.
 	 * @param chaineB Deuxieme chaine.
 	 * @return Difference sous forme de chaine (avec - si negatif).
