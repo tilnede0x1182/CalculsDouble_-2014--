@@ -151,7 +151,7 @@
 		CalculsDouble valeurLigne = new CalculsDouble(0);
 		for (int index = 0; index < longueurB; index++) {
 			valeurLigne.partieEntiere = matrice[index];
-			resultat.partieEntiere = additionneNombres(valeurLigne, resultat).ent;
+			resultat.partieEntiere = additionneNombres(valeurLigne, resultat).partieEntiere;
 		}
 		return resultat;
 	}

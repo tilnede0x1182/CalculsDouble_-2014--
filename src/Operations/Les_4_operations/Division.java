@@ -124,7 +124,7 @@
 	private CalculsDouble[] effectuerDivision(CalculsDouble dividende, CalculsDouble diviseur, boolean tronquee, int chiffresSignificatifs) {
 		int chiffresRestants = chiffresSignificatifs;
 		CalculsDouble reste = new CalculsDouble(0);
-		reste.partieEntiere = dividende.ent + dividende.dec;
+		reste.partieEntiere = dividende.partieEntiere + dividende.partieDecimale;
 		CalculsDouble quotient = new CalculsDouble(0);
 		CalculsDouble diviseurComplet = new CalculsDouble(0);
 		diviseurComplet.partieEntiere = diviseur.partieEntiere + diviseur.partieDecimale;

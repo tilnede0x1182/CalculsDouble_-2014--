@@ -1,0 +1,19 @@
+# Compilation
+build/
+*.class
+
+# Javadoc générée
+javadoc/
+
+# Fichier généré par préprocesseur
+src/CalculsDouble_modifie.java
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

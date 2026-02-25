@@ -27,10 +27,10 @@
 	private void integrerSignesPourSoustraction(CalculsDouble nombreA, CalculsDouble nombreB) {
 		if (nombreA.estNegatif || nombreB.estNegatif) {
 			if (nombreA.estNegatif) {
-				nombreA.partieEntiere = "-" + nombreA.ent;
+				nombreA.partieEntiere = "-" + nombreA.partieEntiere;
 			}
 			if (nombreB.estNegatif) {
-				nombreB.partieEntiere = "-" + nombreB.ent;
+				nombreB.partieEntiere = "-" + nombreB.partieEntiere;
 			}
 		}
 	}
@@ -44,7 +44,7 @@
 	 * @return Resultat de la difference.
 	 */
 	private CalculsDouble calculerDifference(CalculsDouble nombreA, CalculsDouble nombreB, CalculsDouble resultat, int chiffresAvantVirgule) {
-		resultat.partieEntiere = "" + (Integer.parseInt(nombreA.ent) - Integer.parseInt(nombreB.ent));
+		resultat.partieEntiere = "" + (Integer.parseInt(nombreA.partieEntiere) - Integer.parseInt(nombreB.partieEntiere));
 		if (!nombreA.partieDecimale.isEmpty() && !nombreB.partieDecimale.isEmpty()) {
 			resultat.partieDecimale = "" + (Integer.parseInt(nombreA.partieDecimale) - Integer.parseInt(nombreB.partieDecimale));
 		} else {

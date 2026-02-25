@@ -1,11 +1,12 @@
-
 run:
-	# exeuction
+	cd build && java CalculsDouble
 
 compile:
-	# comilation
+	mkdir -p build
+	cd src && python3 Utilitaire/preprocesseur_imports.py CalculsDouble.java
+	javac -proc:none -d build src/CalculsDouble_modifie.java
 
 compile_run: compile run
 
 javadoc:
-	# générer la javadoc dans le dossier javadic à la racin
+	javadoc -d javadoc -private src/CalculsDouble_modifie.java

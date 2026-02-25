@@ -70,7 +70,7 @@
 	/**
 	 * Verifie si un CalculsDouble est un nombre valide.
 	 * @param nombre CalculsDouble a tester.
-	 * @return True si ent et dec sont des nombres valides.
+	 * @return True si partieEntiere et partieDecimale sont des nombres valides.
 	 */
 	public boolean isInteger(CalculsDouble nombre) {
 		boolean resultat = false;

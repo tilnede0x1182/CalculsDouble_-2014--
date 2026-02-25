@@ -13,7 +13,7 @@
 	 */
 	public CalculsDouble(int nombre) {
 		partieEntiere = "" + (int)(nombre);
-		dec = "";
+		partieDecimale = "";
 		extraireSigneNegatif();
 	}
 
@@ -22,8 +22,8 @@
 	 * @param nombre Valeur decimale a stocker.
 	 */
 	public CalculsDouble(double nombre) {
-		ent = "" + (int)(nombre);
-		partieDecimale = extrairePartieDecimale(nombre);
+		partieEntiere = "" + (int)(nombre);
+		partieDecimale = partieDecimale(nombre);
 		extraireSigneNegatif();
 	}
 
@@ -34,7 +34,7 @@
 	 */
 	public CalculsDouble(int nombre, boolean representationAnglaise) {
 		representation_anglaise = representationAnglaise;
-		ent = "" + (int)(nombre);
+		partieEntiere = "" + (int)(nombre);
 		partieDecimale = "0";
 		extraireSigneNegatif();
 	}
@@ -46,14 +46,14 @@
 	 */
 	public CalculsDouble(double nombre, boolean representationAnglaise) {
 		representation_anglaise = representationAnglaise;
-		ent = "" + (int)(nombre);
-		dec = partieDecimale(nombre);
+		partieEntiere = "" + (int)(nombre);
+		partieDecimale = partieDecimale(nombre);
 		extraireSigneNegatif();
 	}
 
 	/**
 	 * Extrait le signe negatif de la partie entiere.
-	 * Met a jour estNegatif et nettoie ent.
+	 * Met a jour estNegatif et nettoie partieEntiere.
 	 */
 	private void extraireSigneNegatif() {
 		if (partieEntiere.contains("-")) {

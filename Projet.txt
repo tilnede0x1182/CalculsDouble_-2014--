@@ -8,7 +8,7 @@ Architecture
 
 Principe de fonctionnement :
 - Les nombres sont stockés sous forme de chaînes de caractères
-- Partie entière (String ent) et partie décimale (String dec) séparées
+- Partie entière (String partieEntiereStr) et partie décimale (String partieDecimaleStr) séparées
 - Permet de manipuler des nombres de longueur arbitraire
 - Gestion du signe via boolean estNegatif
 - Support des représentations française (virgule) et anglaise (point)
@@ -63,6 +63,7 @@ src/Operations/Reconnaissance_expression/ :
 
 src/Utilitaire/ :
 - preprocesseur_imports.py : script de preprocessing des imports personnalisés
+  - Argument --test : exécute les tests de détection d'imports
 
 tests/ :
 - tests.js : tests unitaires en JavaScript (simulation de la classe)
@@ -90,7 +91,7 @@ DRY :
 - Fonctions de manipulation de chaînes réécrivent StringBuilder/String
 
 Sécurité :
-- Champs ent/dec publics, pas d'encapsulation
+- Champs partieEntiereStr/partieDecimaleStr publics, pas d'encapsulation
 - Exceptions non gérées proprement
 
 ================================================================================
@@ -109,6 +110,26 @@ generate_javadoc.bat (ou : javadoc -d javadoc CalculsDouble_modifie.java -privat
 
 Tests :
 node tests/tests.js
+
+================================================================================
+Refactor sémentique des fichiers de code (2026-02-25)
+================================================================================
+
+Modifications appliquées sur CalculsDouble_modifie.java et preprocesseur_imports.py :
+
+1. Séparateurs de sections : // ### ... ### → // === ... ===
+2. Javadoc ajoutés : ~60 fonctions documentées avec @param/@return
+3. Attributs renommés : ent → partieEntiereStr, dec → partieDecimaleStr (~130 occurrences)
+4. Fonctions découpées (14 fonctions > 15 lignes réduites) :
+   - analyse_nombreDouble, verifie_double_correcte, compareNombres_abs
+   - traite_symbolesInt, analyse_expression_sans_parentheses, mange_nombre
+   - propagerArrondiDecimales, clacule_n_premiers, fromScaledValue
+   - envleveZerosInutils, estNul, trouverProchainFacteurPremier
+   - toString, partieDecimale
+5. Variables locales renommées (i, j, tmp → index, resultat, etc.)
+6. preprocesseur_imports.py : refactorisé + ajout argument --test
+
+Fonctions restantes > 15 lignes : 15 (à traiter ultérieurement)
 
 ================================================================================
 Technologies
