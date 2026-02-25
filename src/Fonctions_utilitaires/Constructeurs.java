@@ -22,7 +22,7 @@
 	 * @param nombre Valeur decimale a stocker.
 	 */
 	public CalculsDouble(double nombre) {
-		partieEntiere = "" + (int)(nombre);
+		partieEntiere = "" + (long)(nombre);
 		partieDecimale = partieDecimale(nombre);
 		extraireSigneNegatif();
 	}
@@ -46,7 +46,7 @@
 	 */
 	public CalculsDouble(double nombre, boolean representationAnglaise) {
 		representation_anglaise = representationAnglaise;
-		partieEntiere = "" + (int)(nombre);
+		partieEntiere = "" + (long)(nombre);
 		partieDecimale = partieDecimale(nombre);
 		extraireSigneNegatif();
 	}

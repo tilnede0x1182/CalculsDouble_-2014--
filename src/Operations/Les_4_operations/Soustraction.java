@@ -44,9 +44,9 @@
 	 * @return Resultat de la difference.
 	 */
 	private CalculsDouble calculerDifference(CalculsDouble nombreA, CalculsDouble nombreB, CalculsDouble resultat, int chiffresAvantVirgule) {
-		resultat.partieEntiere = "" + (Integer.parseInt(nombreA.partieEntiere) - Integer.parseInt(nombreB.partieEntiere));
+		resultat.partieEntiere = soustraitChaines(nombreA.partieEntiere, nombreB.partieEntiere);
 		if (!nombreA.partieDecimale.isEmpty() && !nombreB.partieDecimale.isEmpty()) {
-			resultat.partieDecimale = "" + (Integer.parseInt(nombreA.partieDecimale) - Integer.parseInt(nombreB.partieDecimale));
+			resultat.partieDecimale = soustraitChaines(nombreA.partieDecimale, nombreB.partieDecimale);
 		} else {
 			resultat.partieDecimale = "";
 			resultat = nettoyerSignesSoustraction(resultat);

@@ -99,9 +99,9 @@
 	 * @return Resultat de la somme.
 	 */
 	private CalculsDouble calculerSomme(CalculsDouble nombreA, CalculsDouble nombreB, CalculsDouble resultat, int chiffresAvantVirgule) {
-		resultat.partieEntiere = "" + (Integer.parseInt(nombreA.partieEntiere) + Integer.parseInt(nombreB.partieEntiere));
+		resultat.partieEntiere = additionneChaines(nombreA.partieEntiere, nombreB.partieEntiere);
 		if (!nombreA.partieDecimale.isEmpty() && !nombreB.partieDecimale.isEmpty()) {
-			resultat.partieDecimale = "" + (Integer.parseInt(nombreA.partieDecimale) + Integer.parseInt(nombreB.partieDecimale));
+			resultat.partieDecimale = additionneChaines(nombreA.partieDecimale, nombreB.partieDecimale);
 		} else {
 			resultat.partieDecimale = "";
 		}
@@ -120,9 +120,9 @@
 	 */
 	private CalculsDouble gererRetenueDecimale(CalculsDouble nombreA, CalculsDouble nombreB, CalculsDouble resultat) {
 		if (!nombreA.partieDecimale.isEmpty() && !nombreB.partieDecimale.isEmpty()) {
-			int sommePremiersChiffres = Integer.parseInt("" + nombreA.partieDecimale.charAt(0)) + Integer.parseInt("" + nombreB.partieDecimale.charAt(0));
+			int sommePremiersChiffres = chiffreVersInt(nombreA.partieDecimale.charAt(0)) + chiffreVersInt(nombreB.partieDecimale.charAt(0));
 			if (sommePremiersChiffres > 9) {
-				resultat.partieEntiere = "" + (Integer.parseInt(resultat.partieEntiere) + 1);
+				resultat.partieEntiere = incrementeChaine(resultat.partieEntiere);
 				resultat.partieDecimale = resultat.partieDecimale.substring(1, resultat.partieDecimale.length());
 			}
 		}

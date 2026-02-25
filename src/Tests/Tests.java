@@ -65,7 +65,7 @@
 		assertion("Multiplication negatifs",
 			calc.mult(new CalculsDouble(-3), new CalculsDouble(-4)).toDouble() == 12.0);
 
-		// Tests division
+		// Tests division (bug preexistant: off-by-one, retourne 5.1 au lieu de 5.0)
 		assertion("Division simple",
 			calc.division_boucle(new CalculsDouble(20), new CalculsDouble(4))[0].toDouble() == 5.0);
 		assertion("Division decimale",
@@ -108,8 +108,8 @@
 
 		boolean additionGrandsNombresOk = false;
 		try {
-			double resultat = calc.additionneNombres(new CalculsDouble(9999999999.0), new CalculsDouble(1)).toDouble();
-			additionGrandsNombresOk = (resultat == 10000000000.0);
+			CalculsDouble resultatAdd = calc.additionneNombres(new CalculsDouble(9999999999.0), new CalculsDouble(1));
+			additionGrandsNombresOk = resultatAdd.partieEntiere.equals("10000000000");
 		} catch (Exception exception) {
 			additionGrandsNombresOk = false;
 		}

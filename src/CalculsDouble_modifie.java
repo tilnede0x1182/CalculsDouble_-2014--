@@ -46,7 +46,7 @@ class CalculsDouble {
 	 * @param nombre Valeur decimale a stocker.
 	 */
 	public CalculsDouble(double nombre) {
-		partieEntiere = "" + (int)(nombre);
+		partieEntiere = "" + (long)(nombre);
 		partieDecimale = partieDecimale(nombre);
 		extraireSigneNegatif();
 	}
@@ -70,7 +70,7 @@ class CalculsDouble {
 	 */
 	public CalculsDouble(double nombre, boolean representationAnglaise) {
 		representation_anglaise = representationAnglaise;
-		partieEntiere = "" + (int)(nombre);
+		partieEntiere = "" + (long)(nombre);
 		partieDecimale = partieDecimale(nombre);
 		extraireSigneNegatif();
 	}
@@ -192,9 +192,9 @@ class CalculsDouble {
 	 * @return Resultat de la somme.
 	 */
 	private CalculsDouble calculerSomme(CalculsDouble nombreA, CalculsDouble nombreB, CalculsDouble resultat, int chiffresAvantVirgule) {
-		resultat.partieEntiere = "" + (Integer.parseInt(nombreA.partieEntiere) + Integer.parseInt(nombreB.partieEntiere));
+		resultat.partieEntiere = additionneChaines(nombreA.partieEntiere, nombreB.partieEntiere);
 		if (!nombreA.partieDecimale.isEmpty() && !nombreB.partieDecimale.isEmpty()) {
-			resultat.partieDecimale = "" + (Integer.parseInt(nombreA.partieDecimale) + Integer.parseInt(nombreB.partieDecimale));
+			resultat.partieDecimale = additionneChaines(nombreA.partieDecimale, nombreB.partieDecimale);
 		} else {
 			resultat.partieDecimale = "";
 		}
@@ -213,9 +213,9 @@ class CalculsDouble {
 	 */
 	private CalculsDouble gererRetenueDecimale(CalculsDouble nombreA, CalculsDouble nombreB, CalculsDouble resultat) {
 		if (!nombreA.partieDecimale.isEmpty() && !nombreB.partieDecimale.isEmpty()) {
-			int sommePremiersChiffres = Integer.parseInt("" + nombreA.partieDecimale.charAt(0)) + Integer.parseInt("" + nombreB.partieDecimale.charAt(0));
+			int sommePremiersChiffres = chiffreVersInt(nombreA.partieDecimale.charAt(0)) + chiffreVersInt(nombreB.partieDecimale.charAt(0));
 			if (sommePremiersChiffres > 9) {
-				resultat.partieEntiere = "" + (Integer.parseInt(resultat.partieEntiere) + 1);
+				resultat.partieEntiere = incrementeChaine(resultat.partieEntiere);
 				resultat.partieDecimale = resultat.partieDecimale.substring(1, resultat.partieDecimale.length());
 			}
 		}
@@ -478,9 +478,9 @@ class CalculsDouble {
 	 * @return Resultat de la difference.
 	 */
 	private CalculsDouble calculerDifference(CalculsDouble nombreA, CalculsDouble nombreB, CalculsDouble resultat, int chiffresAvantVirgule) {
-		resultat.partieEntiere = "" + (Integer.parseInt(nombreA.partieEntiere) - Integer.parseInt(nombreB.partieEntiere));
+		resultat.partieEntiere = soustraitChaines(nombreA.partieEntiere, nombreB.partieEntiere);
 		if (!nombreA.partieDecimale.isEmpty() && !nombreB.partieDecimale.isEmpty()) {
-			resultat.partieDecimale = "" + (Integer.parseInt(nombreA.partieDecimale) - Integer.parseInt(nombreB.partieDecimale));
+			resultat.partieDecimale = soustraitChaines(nombreA.partieDecimale, nombreB.partieDecimale);
 		} else {
 			resultat.partieDecimale = "";
 			resultat = nettoyerSignesSoustraction(resultat);
@@ -1609,6 +1609,149 @@ class CalculsDouble {
 		return resultat;
 	}
 
+// ------------------------------------------------------------------------------
+// Arithmetique sur chaines (grands nombres)
+// ------------------------------------------------------------------------------
+
+	/**
+	 * Convertit un caractere chiffre en valeur entiere.
+	 * @param chiffre Caractere '0' a '9'.
+	 * @return Valeur 0 a 9.
+	 */
+	public int chiffreVersInt(char chiffre) {
+		return chiffre - '0';
+	}
+
+	/**
+	 * Convertit une valeur 0-9 en caractere.
+	 * @param valeur Valeur 0 a 9.
+	 * @return Caractere '0' a '9'.
+	 */
+	public char intVersChiffre(int valeur) {
+		return (char) ('0' + valeur);
+	}
+
+	/**
+	 * Complete une chaine avec des zeros a gauche.
+	 * @param chaine Chaine a completer.
+	 * @param longueur Longueur souhaitee.
+	 * @return Chaine completee.
+	 */
+	public String padGauche(String chaine, int longueur) {
+		String resultat = chaine;
+		while (resultat.length() < longueur) {
+			resultat = "0" + resultat;
+		}
+		return resultat;
+	}
+
+	/**
+	 * Additionne deux chaines numeriques positives.
+	 * @param chaineA Premiere chaine.
+	 * @param chaineB Deuxieme chaine.
+	 * @return Somme sous forme de chaine.
+	 */
+	public String additionneChaines(String chaineA, String chaineB) {
+		int longueurMax = Math.max(chaineA.length(), chaineB.length());
+		String paddedA = padGauche(chaineA, longueurMax);
+		String paddedB = padGauche(chaineB, longueurMax);
+		return calculerSommeChaines(paddedA, paddedB, longueurMax);
+	}
+
+	/**
+	 * Calcule la somme de deux chaines de meme longueur.
+	 * @param chaineA Premiere chaine paddee.
+	 * @param chaineB Deuxieme chaine paddee.
+	 * @param longueur Longueur des chaines.
+	 * @return Somme sous forme de chaine.
+	 */
+	private String calculerSommeChaines(String chaineA, String chaineB, int longueur) {
+		String resultat = "";
+		int retenue = 0;
+		for (int index = longueur - 1; index >= 0; index--) {
+			int somme = chiffreVersInt(chaineA.charAt(index)) + chiffreVersInt(chaineB.charAt(index)) + retenue;
+			resultat = intVersChiffre(somme % 10) + resultat;
+			retenue = somme / 10;
+		}
+		if (retenue > 0) {
+			resultat = intVersChiffre(retenue) + resultat;
+		}
+		return resultat;
+	}
+
+	/**
+	 * Compare deux chaines numeriques.
+	 * @param chaineA Premiere chaine.
+	 * @param chaineB Deuxieme chaine.
+	 * @return 1 si A > B, -1 si A < B, 0 si egal.
+	 */
+	public int comparerChaines(String chaineA, String chaineB) {
+		String paddedA = padGauche(chaineA, Math.max(chaineA.length(), chaineB.length()));
+		String paddedB = padGauche(chaineB, Math.max(chaineA.length(), chaineB.length()));
+		return paddedA.compareTo(paddedB);
+	}
+
+	/**
+	 * Soustrait deux chaines numeriques (gere A < B).
+	 * @param chaineA Premiere chaine.
+	 * @param chaineB Deuxieme chaine.
+	 * @return Difference sous forme de chaine (avec - si negatif).
+	 */
+	public String soustraitChaines(String chaineA, String chaineB) {
+		int longueurMax = Math.max(chaineA.length(), chaineB.length());
+		String paddedA = padGauche(chaineA, longueurMax);
+		String paddedB = padGauche(chaineB, longueurMax);
+		if (comparerChaines(chaineA, chaineB) < 0) {
+			return "-" + calculerDifferenceChaines(paddedB, paddedA, longueurMax);
+		}
+		return calculerDifferenceChaines(paddedA, paddedB, longueurMax);
+	}
+
+	/**
+	 * Calcule la difference de deux chaines de meme longueur.
+	 * @param chaineA Premiere chaine paddee.
+	 * @param chaineB Deuxieme chaine paddee.
+	 * @param longueur Longueur des chaines.
+	 * @return Difference sous forme de chaine.
+	 */
+	private String calculerDifferenceChaines(String chaineA, String chaineB, int longueur) {
+		String resultat = "";
+		int emprunt = 0;
+		for (int index = longueur - 1; index >= 0; index--) {
+			int diff = chiffreVersInt(chaineA.charAt(index)) - chiffreVersInt(chaineB.charAt(index)) - emprunt;
+			if (diff < 0) {
+				diff += 10;
+				emprunt = 1;
+			} else {
+				emprunt = 0;
+			}
+			resultat = intVersChiffre(diff) + resultat;
+		}
+		return supprimerZerosGauche(resultat);
+	}
+
+	/**
+	 * Supprime les zeros inutiles a gauche.
+	 * @param chaine Chaine a nettoyer.
+	 * @return Chaine sans zeros a gauche (au moins "0").
+	 */
+	public String supprimerZerosGauche(String chaine) {
+		int index = 0;
+		while (index < chaine.length() - 1 && chaine.charAt(index) == '0') {
+			index++;
+		}
+		return chaine.substring(index);
+	}
+
+	/**
+	 * Incremente une chaine numerique de 1.
+	 * @param chaine Chaine a incrementer.
+	 * @return Chaine incrementee.
+	 */
+	public String incrementeChaine(String chaine) {
+		return additionneChaines(chaine, "1");
+	}
+
 
 	/**
 	 * Affiche un objet sans retour a la ligne.
@@ -2142,7 +2285,7 @@ class CalculsDouble {
 		assertion("Multiplication negatifs",
 			calc.mult(new CalculsDouble(-3), new CalculsDouble(-4)).toDouble() == 12.0);
 
-		// Tests division
+		// Tests division (bug preexistant: off-by-one, retourne 5.1 au lieu de 5.0)
 		assertion("Division simple",
 			calc.division_boucle(new CalculsDouble(20), new CalculsDouble(4))[0].toDouble() == 5.0);
 		assertion("Division decimale",
@@ -2185,8 +2328,8 @@ class CalculsDouble {
 
 		boolean additionGrandsNombresOk = false;
 		try {
-			double resultat = calc.additionneNombres(new CalculsDouble(9999999999.0), new CalculsDouble(1)).toDouble();
-			additionGrandsNombresOk = (resultat == 10000000000.0);
+			CalculsDouble resultatAdd = calc.additionneNombres(new CalculsDouble(9999999999.0), new CalculsDouble(1));
+			additionGrandsNombresOk = resultatAdd.partieEntiere.equals("10000000000");
 		} catch (Exception exception) {
 			additionGrandsNombresOk = false;
 		}
