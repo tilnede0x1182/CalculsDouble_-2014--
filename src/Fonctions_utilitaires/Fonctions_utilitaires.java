@@ -94,18 +94,20 @@
 		if (!isInteger(nombre)) {
 			return false;
 		}
-		int longueurEntiere = nombre.partieEntiere.length();
-		int longueurDecimale = 0;
-		if (!nombre.partieDecimale.isEmpty()) {
-			longueurDecimale = nombre.partieDecimale.length();
+		return partieEstNulle(nombre.partieEntiere) && partieEstNulle(nombre.partieDecimale);
+	}
+
+	/**
+	 * Verifie si une chaine ne contient que des zeros.
+	 * @param partie Chaine a verifier.
+	 * @return True si vide ou uniquement des zeros.
+	 */
+	private boolean partieEstNulle(String partie) {
+		if (partie.isEmpty()) {
+			return true;
 		}
-		for (int index = 0; index < longueurEntiere; index++) {
-			if (nombre.partieEntiere.charAt(index) != '0') {
-				return false;
-			}
-		}
-		for (int index = 0; index < longueurDecimale; index++) {
-			if (nombre.partieDecimale.charAt(index) != '0') {
+		for (int index = 0; index < partie.length(); index++) {
+			if (partie.charAt(index) != '0') {
 				return false;
 			}
 		}

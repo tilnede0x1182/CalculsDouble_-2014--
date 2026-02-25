@@ -58,8 +58,8 @@ src/Operations/Operations_utilitaires/ :
 - Gestion_des_0.java : epureZerosEnt, envleveZerosInutils
 
 src/Operations/Reconnaissance_expression/ :
-- Reconnaissance_doubles_sans_parentheses.java : parseur d'expressions (pile)
-- Reconnaissance_entiers_sans_parentheses(1).java : (non lu, probablement similaire)
+- Reconnaissance_doubles_sans_parentheses.java : parseur d'expressions avec pile, gère décimaux (important)
+- Reconnaissance_entiers_sans_parentheses.java : version limitée aux entiers, redondante (la version doubles gère aussi les entiers)
 
 src/Utilitaire/ :
 - preprocesseur_imports.py : script de preprocessing des imports personnalisés
@@ -69,17 +69,21 @@ tests/ :
 - tests.js : tests unitaires en JavaScript (simulation de la classe)
 
 Archives/ :
-- CalculsDouble_modifie.java.backup : sauvegarde
-- preprocesseur_imports.py : copie du script
-- READ-ME.txt : instructions de compilation
+- CalculsDouble_modifie.java : ancienne version du fichier consolidé (avant refactor)
+- CalculsDouble_modifie.java.backup : sauvegarde de sécurité
+- compile.bat : ancien script batch de compilation (remplacé par Makefile)
+- generate_javadoc.bat : ancien script batch de génération Javadoc (remplacé par Makefile)
+- python3m1.py : ancienne version du préprocesseur d'imports (code non refactorisé)
+- READ-ME.txt : instructions de compilation originales (2 lignes)
 
 ================================================================================
-Bugs connus (A_faire.md)
+Bugs corrigés (2026-02-25)
 ================================================================================
 
-1. additionneNombres : perd la partie décimale si un seul opérande en a une (12,5 + 3 = 15 au lieu de 15,5)
-2. arrondi : force estNegatif=true quand dec est vide (bug)
-3. Integer.parseInt : plante pour nombres > 10 chiffres (devrait utiliser BigInteger)
+1. Division par zéro : boucle infinie → corrigé (retourne null avec message)
+2. Grands nombres : Integer.parseInt plantait > 10 chiffres → corrigé (arithmétique sur chaînes)
+3. Division off-by-one : "00" comparé incorrectement → corrigé (supprimerZerosGauche)
+4. Addition décimal + entier : fonctionnel (tests passent)
 
 ================================================================================
 Points d'amélioration identifiés

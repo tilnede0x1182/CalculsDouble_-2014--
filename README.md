@@ -56,3 +56,29 @@ La documentation est générée dans `javadoc/`.
 - Comparaison, valeur absolue, arrondis
 - Décomposition en facteurs premiers
 - Support représentation française (virgule) et anglaise (point)
+- Arithmétique sur grands nombres (pas de limite Integer.MAX_VALUE)
+
+## Tests
+
+```bash
+make run
+```
+
+23 tests unitaires couvrant :
+- Constructeurs (positif, négatif, décimal, zéro)
+- Addition, soustraction, multiplication, division
+- Valeur absolue
+- Division par zéro (retourne null avec message)
+- Grands nombres (> 10 chiffres)
+
+## À noter
+
+**Reconnaissance_expression/** : Contient 2 fichiers mais seul `Reconnaissance_doubles_sans_parentheses.java` est utile. La version `_entiers_` est redondante car la version doubles gère aussi les entiers (un entier est un cas particulier de décimal).
+
+**Archives/** : Anciennes versions avant refactor (2026-02-25)
+- `CalculsDouble_modifie.java` : ancienne version du fichier consolidé
+- `CalculsDouble_modifie.java.backup` : sauvegarde de sécurité
+- `compile.bat` : ancien script batch (remplacé par Makefile)
+- `generate_javadoc.bat` : ancien script batch (remplacé par Makefile)
+- `python3m1.py` : ancienne version du préprocesseur (code non refactorisé)
+- `READ-ME.txt` : instructions de compilation originales
