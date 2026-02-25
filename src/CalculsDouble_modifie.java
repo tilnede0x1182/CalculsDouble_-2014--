@@ -1180,16 +1180,28 @@ class CalculsDouble {
 	 * @return 0 si egales, 1 si A > B, 2 si B > A.
 	 */
 	private int comparerPartiesEntieres(CalculsDouble nombreA, CalculsDouble nombreB) {
-		if (nombreA.partieEntiere.length() > nombreB.partieEntiere.length()) {
+		String entA = supprimerZerosGauche(nombreA.partieEntiere);
+		String entB = supprimerZerosGauche(nombreB.partieEntiere);
+		if (entA.length() > entB.length()) {
 			return 1;
 		}
-		if (nombreA.partieEntiere.length() < nombreB.partieEntiere.length()) {
+		if (entA.length() < entB.length()) {
 			return 2;
 		}
-		int longueur = nombreA.partieEntiere.length();
+		return comparerChiffresParChiffres(entA, entB);
+	}
+
+	/**
+	 * Compare deux chaines chiffre par chiffre.
+	 * @param chaineA Premiere chaine.
+	 * @param chaineB Deuxieme chaine.
+	 * @return 0 si egales, 1 si A > B, 2 si B > A.
+	 */
+	private int comparerChiffresParChiffres(String chaineA, String chaineB) {
+		int longueur = chaineA.length();
 		for (int index = 0; index < longueur; index++) {
-			int chiffreA = Integer.parseInt("" + nombreA.partieEntiere.charAt(index));
-			int chiffreB = Integer.parseInt("" + nombreB.partieEntiere.charAt(index));
+			int chiffreA = chiffreVersInt(chaineA.charAt(index));
+			int chiffreB = chiffreVersInt(chaineB.charAt(index));
 			if (chiffreA > chiffreB) {
 				return 1;
 			}
