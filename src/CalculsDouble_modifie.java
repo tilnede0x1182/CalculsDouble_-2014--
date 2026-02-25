@@ -7,63 +7,95 @@ class CalculsDouble {
 	boolean estNegatif=false;
 	boolean representation_anglaise=false;
 
-	String ent;
-	String dec;
+	String partieEntiereStr;
+	String partieDecimaleStr;
 
-// ############################### Constructeurs ####################################### //
+// ==============================================================================
+// Constructeurs
+// ==============================================================================
 
-	public CalculsDouble () {
-		ent="0";
-		dec="";
+	/**
+	 * Constructeur par defaut.
+	 * Initialise le nombre a 0.
+	 */
+	public CalculsDouble() {
+		partieEntiereStr="0";
+		partieDecimaleStr="";
 	}
 
-	public CalculsDouble (int n0) {
-		ent = ""+(int)(n0);
-		dec = "";
+	/**
+	 * Constructeur avec un entier.
+	 * @param n0 Valeur entiere initiale.
+	 */
+	public CalculsDouble(int n0) {
+		partieEntiereStr = ""+(int)(n0);
+		partieDecimaleStr = "";
 
-		if (ent.contains("-")) {
+		if (partieEntiereStr.contains("-")) {
 			estNegatif = true;
-			ent = ent.replace("-", "");
+			partieEntiereStr = partieEntiereStr.replace("-", "");
 		}
 	}
 
-	public CalculsDouble (double n0) {
-		ent = ""+(int)(n0);
-		dec = partieDecimale(n0);
+	/**
+	 * Constructeur avec un double.
+	 * @param n0 Valeur decimale initiale.
+	 */
+	public CalculsDouble(double n0) {
+		partieEntiereStr = ""+(int)(n0);
+		partieDecimaleStr = partieDecimale(n0);
 
-		if (ent.contains("-")) {
+		if (partieEntiereStr.contains("-")) {
 			estNegatif = true;
-			ent = ent.replace("-", "");
+			partieEntiereStr = partieEntiereStr.replace("-", "");
 		}
 	}
 
-	public CalculsDouble (int n0, boolean repr_anglaise) {
+	/**
+	 * Constructeur avec entier et format de representation.
+	 * @param n0 Valeur entiere initiale.
+	 * @param repr_anglaise True pour format anglais (point decimal).
+	 */
+	public CalculsDouble(int n0, boolean repr_anglaise) {
 		representation_anglaise = repr_anglaise;
 
-		ent = ""+(int)(n0);
-		dec = "0";
+		partieEntiereStr = ""+(int)(n0);
+		partieDecimaleStr = "0";
 
-		if (ent.contains("-")) {
+		if (partieEntiereStr.contains("-")) {
 			estNegatif = true;
-			ent = ent.replace("-", "");
+			partieEntiereStr = partieEntiereStr.replace("-", "");
 		}
 	}
 
-	public CalculsDouble (double n0, boolean repr_anglaise) {
+	/**
+	 * Constructeur avec double et format de representation.
+	 * @param n0 Valeur decimale initiale.
+	 * @param repr_anglaise True pour format anglais (point decimal).
+	 */
+	public CalculsDouble(double n0, boolean repr_anglaise) {
 		representation_anglaise = repr_anglaise;
 
-		ent = ""+(int)(n0);
-		dec = partieDecimale(n0);
+		partieEntiereStr = ""+(int)(n0);
+		partieDecimaleStr = partieDecimale(n0);
 
-		if (ent.contains("-")) {
+		if (partieEntiereStr.contains("-")) {
 			estNegatif = true;
-			ent = ent.replace("-", "");
+			partieEntiereStr = partieEntiereStr.replace("-", "");
 		}
 	}
 
 
-// ################################# Opérations ######################################## //
+// ==============================================================================
+// Opérations
+// ==============================================================================
 
+	/**
+	 * Complete une chaine avec des zeros a droite.
+	 * @param value Chaine a completer.
+	 * @param targetLength Longueur cible.
+	 * @return Chaine completee.
+	 */
 	private static String padRight(String value, int targetLength) {
 		StringBuilder sb = new StringBuilder(value);
 		while (sb.length() < targetLength) {
@@ -72,6 +104,12 @@ class CalculsDouble {
 		return sb.toString();
 	}
 
+	/**
+	 * Complete une chaine avec des zeros a gauche.
+	 * @param value Chaine a completer.
+	 * @param targetLength Longueur cible.
+	 * @return Chaine completee.
+	 */
 	private static String padLeft(String value, int targetLength) {
 		StringBuilder sb = new StringBuilder(value);
 		while (sb.length() < targetLength) {
@@ -80,8 +118,14 @@ class CalculsDouble {
 		return sb.toString();
 	}
 
+	/**
+	 * Convertit un CalculsDouble en BigInteger avec echelle.
+	 * @param nombre Nombre a convertir.
+	 * @param scale Nombre de decimales a integrer.
+	 * @return BigInteger representant le nombre mis a echelle.
+	 */
 	private BigInteger toScaledBigInteger(CalculsDouble nombre, int scale) {
-		String digits = nombre.ent + padRight(nombre.dec, scale);
+		String digits = nombre.partieEntiereStr + padRight(nombre.partieDecimaleStr, scale);
 		if (digits.isEmpty()) {
 			digits = "0";
 		}
@@ -92,33 +136,56 @@ class CalculsDouble {
 		return valeur;
 	}
 
-	private CalculsDouble fromScaledValue(BigInteger valeur, int scale) {
-		CalculsDouble res = new CalculsDouble();
-		res.estNegatif = valeur.signum() < 0;
-		BigInteger absolue = valeur.abs();
-		String digits = absolue.toString();
-		if (scale == 0) {
-			res.ent = digits;
-			res.dec = "";
-		} else {
-			if (digits.length() <= scale) {
-				digits = padLeft(digits, scale + 1);
-			}
-			int split = digits.length() - scale;
-			res.ent = digits.substring(0, split);
-			res.dec = digits.substring(split);
-			res.dec = res.dec.replaceFirst("0+$", "");
+	/**
+	 * Extrait les parties entiere et decimale depuis les chiffres.
+	 * @param resultat CalculsDouble a remplir.
+	 * @param chiffres Chaine de chiffres.
+	 * @param echelle Nombre de decimales.
+	 */
+	private void extrairePartiesDepuisChiffres(CalculsDouble resultat, String chiffres, int echelle) {
+		String chiffresComplets = chiffres;
+		if (chiffresComplets.length() <= echelle) {
+			chiffresComplets = padLeft(chiffresComplets, echelle + 1);
 		}
-		if (res.ent.isEmpty()) res.ent = "0";
-		if (res.dec == null) res.dec = "";
-		if (res.ent.equals("0") && res.dec.isEmpty()) {
-			res.estNegatif = false;
-		}
-		return res;
+		int pointCoupure = chiffresComplets.length() - echelle;
+		resultat.partieEntiereStr = chiffresComplets.substring(0, pointCoupure);
+		resultat.partieDecimaleStr = chiffresComplets.substring(pointCoupure).replaceFirst("0+$", "");
 	}
 
-	public CalculsDouble additionneNombres (CalculsDouble a, CalculsDouble b){
-		int scale = Math.max(a.dec.length(), b.dec.length());
+	/**
+	 * Reconstitue un CalculsDouble depuis un BigInteger mis a echelle.
+	 * @param valeur BigInteger a reconvertir.
+	 * @param echelle Nombre de decimales encodees.
+	 * @return CalculsDouble reconstitue.
+	 */
+	private CalculsDouble fromScaledValue(BigInteger valeur, int echelle) {
+		CalculsDouble resultat = new CalculsDouble();
+		resultat.estNegatif = valeur.signum() < 0;
+		String chiffres = valeur.abs().toString();
+
+		if (echelle == 0) {
+			resultat.partieEntiereStr = chiffres;
+			resultat.partieDecimaleStr = "";
+		} else {
+			extrairePartiesDepuisChiffres(resultat, chiffres, echelle);
+		}
+
+		if (resultat.partieEntiereStr.isEmpty()) resultat.partieEntiereStr = "0";
+		if (resultat.partieDecimaleStr == null) resultat.partieDecimaleStr = "";
+		if (resultat.partieEntiereStr.equals("0") && resultat.partieDecimaleStr.isEmpty()) {
+			resultat.estNegatif = false;
+		}
+		return resultat;
+	}
+
+	/**
+	 * Additionne deux CalculsDouble.
+	 * @param a Premier nombre.
+	 * @param b Second nombre.
+	 * @return Somme des deux nombres.
+	 */
+	public CalculsDouble additionneNombres(CalculsDouble a, CalculsDouble b) {
+		int scale = Math.max(a.partieDecimaleStr.length(), b.partieDecimaleStr.length());
 		BigInteger somme = toScaledBigInteger(a, scale).add(toScaledBigInteger(b, scale));
 		return fromScaledValue(somme, scale);
 	}
@@ -143,8 +210,8 @@ class CalculsDouble {
 	 */
 	private int compterDecimalesTotal(CalculsDouble nombreA, CalculsDouble nombreB) {
 		int totalDecimales = 0;
-		if (!nombreA.dec.isEmpty()) totalDecimales += nombreA.dec.length();
-		if (!nombreB.dec.isEmpty()) totalDecimales += nombreB.dec.length();
+		if (!nombreA.partieDecimaleStr.isEmpty()) totalDecimales += nombreA.partieDecimaleStr.length();
+		if (!nombreB.partieDecimaleStr.isEmpty()) totalDecimales += nombreB.partieDecimaleStr.length();
 		return totalDecimales;
 	}
 
@@ -154,7 +221,7 @@ class CalculsDouble {
 	 * @return Longueur totale.
 	 */
 	private int longueurTotaleNombre(CalculsDouble nombre) {
-		return nombre.ent.length() + nombre.dec.length();
+		return nombre.partieEntiereStr.length() + nombre.partieDecimaleStr.length();
 	}
 
 	/**
@@ -217,8 +284,8 @@ class CalculsDouble {
 		CalculsDouble somme = new CalculsDouble(0);
 		CalculsDouble valeurPartielle = new CalculsDouble(0);
 		for (int index = 0; index < matriceResultats.length; index++) {
-			valeurPartielle.ent = matriceResultats[index];
-			somme.ent = additionneNombres(valeurPartielle, somme).ent;
+			valeurPartielle.partieEntiereStr = matriceResultats[index];
+			somme.partieEntiereStr = additionneNombres(valeurPartielle, somme).partieEntiereStr;
 		}
 		return somme;
 	}
@@ -229,10 +296,10 @@ class CalculsDouble {
 	 * @param nombreDecimales Nombre de decimales attendues.
 	 */
 	private void ajusterPartieDecimale(CalculsDouble resultat, int nombreDecimales) {
-		if (nombreDecimales > 0 && resultat.ent.length() > nombreDecimales) {
-			int positionVirgule = resultat.ent.length() - nombreDecimales;
-			resultat.dec = resultat.ent.substring(positionVirgule);
-			resultat.ent = resultat.ent.substring(0, positionVirgule);
+		if (nombreDecimales > 0 && resultat.partieEntiereStr.length() > nombreDecimales) {
+			int positionVirgule = resultat.partieEntiereStr.length() - nombreDecimales;
+			resultat.partieDecimaleStr = resultat.partieEntiereStr.substring(positionVirgule);
+			resultat.partieEntiereStr = resultat.partieEntiereStr.substring(0, positionVirgule);
 		}
 	}
 
@@ -252,13 +319,13 @@ class CalculsDouble {
 			nombreB = temporaire;
 		}
 
-		String chaineNombreA = nombreA.ent + nombreA.dec;
-		String chaineNombreB = nombreB.ent + nombreB.dec;
+		String chaineNombreA = nombreA.partieEntiereStr + nombreA.partieDecimaleStr;
+		String chaineNombreB = nombreB.partieEntiereStr + nombreB.partieDecimaleStr;
 
 		String[] matriceResultats = remplirMatriceMultiplication(chaineNombreA, chaineNombreB);
 		CalculsDouble resultat = additionnerResultatsPartiels(matriceResultats);
 
-		if (!nombreA.dec.isEmpty() || !nombreB.dec.isEmpty()) {
+		if (!nombreA.partieDecimaleStr.isEmpty() || !nombreB.partieDecimaleStr.isEmpty()) {
 			ajusterPartieDecimale(resultat, totalDecimales);
 		}
 
@@ -266,13 +333,19 @@ class CalculsDouble {
 		return resultat;
 	}
 
-	public CalculsDouble soustraitNombres (CalculsDouble a, CalculsDouble b){
+	/**
+	 * Soustrait deux CalculsDouble (a - b).
+	 * @param a Nombre dont on soustrait.
+	 * @param b Nombre a soustraire.
+	 * @return Difference a - b.
+	 */
+	public CalculsDouble soustraitNombres(CalculsDouble a, CalculsDouble b) {
 		int recul = 0;
-		int chiffres_avant_la_virgule = Math.min(compteOcurrences(a.dec, 
-			'0'), compteOcurrences(b.dec, '0'));
+		int chiffres_avant_la_virgule = Math.min(compteOcurrences(a.partieDecimaleStr, 
+			'0'), compteOcurrences(b.partieDecimaleStr, '0'));
 		CalculsDouble c = new CalculsDouble ();
 		CalculsDouble oppose = copie(b);
-		boolean estZero = oppose.ent.equals("0") && (oppose.dec.isEmpty() || oppose.dec.replace("0", "").isEmpty());
+		boolean estZero = oppose.partieEntiereStr.equals("0") && (oppose.partieDecimaleStr.isEmpty() || oppose.partieDecimaleStr.replace("0", "").isEmpty());
 		if (!estZero) {
 			oppose.estNegatif = !oppose.estNegatif;
 		} else {
@@ -355,8 +428,8 @@ class CalculsDouble {
 	 */
 	private CalculsDouble[] resultatDiviseurUn(CalculsDouble dividende) {
 		CalculsDouble quotient = new CalculsDouble(0);
-		quotient.ent = dividende.ent;
-		quotient.dec = dividende.dec;
+		quotient.partieEntiereStr = dividende.partieEntiereStr;
+		quotient.partieDecimaleStr = dividende.partieDecimaleStr;
 		return new CalculsDouble[]{quotient, new CalculsDouble(0)};
 	}
 
@@ -390,15 +463,15 @@ class CalculsDouble {
 			int chiffresRestants, int chiffresTotal) {
 		CalculsDouble increment = new CalculsDouble(0);
 		if (!estApresVirgule) {
-			increment.ent = "1";
-			increment.dec = "";
+			increment.partieEntiereStr = "1";
+			increment.partieDecimaleStr = "";
 		} else {
-			increment.ent = "0";
+			increment.partieEntiereStr = "0";
 			StringBuilder zeros = new StringBuilder();
 			for (int index = chiffresRestants + 1; index < chiffresTotal; index++) {
 				zeros.append("0");
 			}
-			increment.dec = zeros.toString() + "1";
+			increment.partieDecimaleStr = zeros.toString() + "1";
 		}
 		return increment;
 	}
@@ -448,11 +521,11 @@ class CalculsDouble {
 			boolean tronquee, int chiffresSignificatifs) {
 		int chiffresRestants = chiffresSignificatifs;
 		CalculsDouble reste = new CalculsDouble(0);
-		reste.ent = dividende.ent + dividende.dec;
+		reste.partieEntiereStr = dividende.partieEntiereStr + dividende.partieDecimaleStr;
 		CalculsDouble quotient = new CalculsDouble(0);
 
 		CalculsDouble diviseurComplet = new CalculsDouble(0);
-		diviseurComplet.ent = diviseur.ent + diviseur.dec;
+		diviseurComplet.partieEntiereStr = diviseur.partieEntiereStr + diviseur.partieDecimaleStr;
 
 		boolean apresVirguleGlobal = false;
 
@@ -501,12 +574,16 @@ class CalculsDouble {
 	}**/
 
 
-// ########################## Fonctions mathématiques ################################## //
+// ==============================================================================
+// Fonctions mathématiques
+// ==============================================================================
 
 	/**
-		Enlève les zéros en début de string dans la partie entiere (String ent).
-	**/
-	public String epureZerosEnt (String ent) {
+	 * Enleve les zeros en debut de chaine dans la partie entiere.
+	 * @param ent Partie entiere a nettoyer.
+	 * @return Partie entiere sans zeros inutiles en debut.
+	 */
+	public String epureZerosEnt(String ent) {
 		boolean plus_de_zeros = false;
 		int  res = 0, lenent = ent.length();
 
@@ -525,97 +602,141 @@ class CalculsDouble {
 	}
 
 	/**
-		-1 : pas de chiffres significatifs (on fait comme en maths : 
-		le moins de chiffres possible). n : n chiffres aux minimum.
-	**/
-	public String envleveZerosInutils (String dec) {
-		boolean plus_de_zeros = false;
-		int  res = 0, lendec = dec.length();
-
-		/**
-		**	Parcours le str pour savoir s'il n'ya a plus de zeros (boolean) 
-		**	et dès qu'on a fini, enlève les zeros en trop.
-		**/
-		res = lendec;
-		for (int i=0; i<lendec; i++) {
-			if (dec.charAt(i)=='0') {
-				plus_de_zeros = true;
-				res = i;
-			}
-			else {
-				plus_de_zeros = false;
-				res = lendec;
+	 * Trouve la position du dernier chiffre non-zero.
+	 * @param partieDecimale Chaine a analyser.
+	 * @return Position apres le dernier non-zero.
+	 */
+	private int trouverDernierNonZero(String partieDecimale) {
+		int positionCoupure = partieDecimale.length();
+		for (int index = 0; index < partieDecimale.length(); index++) {
+			if (partieDecimale.charAt(index) == '0') {
+				positionCoupure = index;
+			} else {
+				positionCoupure = partieDecimale.length();
 			}
 		}
-
-		return (dec.substring(0, res));
+		return positionCoupure;
 	}
 
-	public String chiffresSignificatifs (String dec, int nn) {
-		int lendec = dec.length();
-		int nbrZeros = nn-lendec;
+	/**
+	 * Enleve les zeros inutiles en fin de partie decimale.
+	 * @param partieDecimale Partie decimale a nettoyer.
+	 * @return Partie decimale sans zeros inutiles en fin.
+	 */
+	public String envleveZerosInutils(String partieDecimale) {
+		int positionCoupure = trouverDernierNonZero(partieDecimale);
+		return partieDecimale.substring(0, positionCoupure);
+	}
 
-		/**
-			enlèves les zéros inutils (sans les compter au préalable 
-			(plus simple à coder))
-		**/
-		dec = envleveZerosInutils (dec);
+	/**
+	 * Ajuste la partie decimale au nombre de chiffres significatifs.
+	 * @param dec Partie decimale.
+	 * @param nn Nombre de chiffres souhaites (-1 = minimum).
+	 * @return Partie decimale ajustee.
+	 */
+	public String chiffresSignificatifs(String partieDecimaleParam, int nombreChiffres) {
+		int longueurDecimale = partieDecimaleParam.length();
+		int nombreZerosManquants = nombreChiffres - longueurDecimale;
 
-		if (nn == -1) return dec; 
-		// cas de base (on enlève 
-		// le plus de zéros possibles, comme en maths).
+		partieDecimaleParam = envleveZerosInutils(partieDecimaleParam);
 
-		/* Ajoute des zeros si besoin */
-		for (int i=0; i<nbrZeros; i++) {
-			dec+='0';
+		if (nombreChiffres == -1) {
+			return partieDecimaleParam;
 		}
 
-		return dec;
+		for (int index = 0; index < nombreZerosManquants; index++) {
+			partieDecimaleParam += '0';
+		}
+
+		return partieDecimaleParam;
 	}
 
-	public int abs (int n0) {
+	/**
+	 * Calcule la valeur absolue d un entier.
+	 * @param n0 Entier.
+	 * @return Valeur absolue.
+	 */
+	public int abs(int n0) {
 		if (n0<0) return -n0;
 		else return n0;
 	}
 
-	public void abs () {
+	/**
+	 * Rend ce nombre positif (valeur absolue in-place).
+	 */
+	public void abs() {
 		this.estNegatif = false;
 	}
 
-	public CalculsDouble abs (CalculsDouble n0) {
+	/**
+	 * Calcule la valeur absolue d un CalculsDouble.
+	 * @param n0 Nombre.
+	 * @return Copie avec valeur absolue.
+	 */
+	public CalculsDouble abs(CalculsDouble n0) {
 		CalculsDouble n1 = new CalculsDouble(0);
-		n1.ent = n0.ent; n1.dec = n0.dec; n1.representation_anglaise 
+		n1.partieEntiereStr = n0.partieEntiereStr; n1.partieDecimaleStr = n0.partieDecimaleStr; n1.representation_anglaise 
 			= n0.representation_anglaise;
 		n1.estNegatif = false;
 
 		return n1;
 	}
 
-	public int partieEntiere (double n0) {
+	/**
+	 * Extrait la partie entiere d un double.
+	 * @param n0 Nombre decimal.
+	 * @return Partie entiere.
+	 */
+	public int partieEntiere(double n0) {
 		return ((int)(n0));
 	}
 
-	public int partieEntiere () {
-		if (this.ent.isEmpty()) return 0;
-		else return Integer.parseInt(this.ent);
+	/**
+	 * Retourne la partie entiere de ce nombre.
+	 * @return Partie entiere ou 0 si vide.
+	 */
+	public int partieEntiere() {
+		if (this.partieEntiereStr.isEmpty()) return 0;
+		else return Integer.parseInt(this.partieEntiereStr);
 	}
 
 
-	public int arrondiEntier (CalculsDouble n0) {
-		String res = arrondi(n0).ent;
+	/**
+	 * Arrondit un CalculsDouble et retourne l entier.
+	 * @param n0 Nombre a arrondir.
+	 * @return Entier arrondi.
+	 */
+	public int arrondiEntier(CalculsDouble n0) {
+		String res = arrondi(n0).partieEntiereStr;
 		if (res.isEmpty()) return 0;
 		else return Integer.parseInt(res);
 	}
 
-	public String arrondiString (CalculsDouble n1) {
+	/**
+	 * Arrondit un CalculsDouble et retourne une chaine.
+	 * @param n1 Nombre a arrondir.
+	 * @return Representation textuelle arrondie.
+	 */
+	public String arrondiString(CalculsDouble n1) {
 		return arrondiString(n1, 0);
 	}
 
-	public String arrondiString (CalculsDouble n1, int r0) {
+	/**
+	 * Arrondit un CalculsDouble a r0 decimales et retourne une chaine.
+	 * @param n1 Nombre a arrondir.
+	 * @param r0 Nombre de decimales.
+	 * @return Representation textuelle arrondie.
+	 */
+	public String arrondiString(CalculsDouble n1, int r0) {
 		return (""+arrondi(n1, r0));
 	}
 
-	public CalculsDouble arrondi (CalculsDouble n1) {
+	/**
+	 * Arrondit un CalculsDouble a l entier.
+	 * @param n1 Nombre a arrondir.
+	 * @return Nombre arrondi.
+	 */
+	public CalculsDouble arrondi(CalculsDouble n1) {
 		return arrondi(n1, 0);
 	}
 
@@ -636,12 +757,26 @@ class CalculsDouble {
 	 * @return Nombre arrondi a l'entier.
 	 */
 	private CalculsDouble arrondirSansDecimales(CalculsDouble nombre) {
-		if (nombre.dec.isEmpty()) return nombre;
-		if (doitArrondiSuperieur(nombre.dec, 0)) {
+		if (nombre.partieDecimaleStr.isEmpty()) return nombre;
+		if (doitArrondiSuperieur(nombre.partieDecimaleStr, 0)) {
 			nombre = this.additionneNombres(nombre, new CalculsDouble(1));
 		}
-		nombre.dec = "";
+		nombre.partieDecimaleStr = "";
 		return nombre;
+	}
+
+	/**
+	 * Traite un chiffre lors de la propagation d'arrondi.
+	 * @param partieDecimale Partie decimale actuelle.
+	 * @param position Position du chiffre.
+	 * @return Nouvelle partie decimale ou null si propagation continue.
+	 */
+	private String traiterChiffrePropagation(String partieDecimale, int position) {
+		int chiffreIncrement = Character.getNumericValue(partieDecimale.charAt(position - 1)) + 1;
+		if (chiffreIncrement >= 10) {
+			return partieDecimale.substring(0, position);
+		}
+		return partieDecimale.substring(0, position - 1) + chiffreIncrement;
 	}
 
 	/**
@@ -651,27 +786,22 @@ class CalculsDouble {
 	 * @return Nombre avec arrondi propage.
 	 */
 	private CalculsDouble propagerArrondiDecimales(CalculsDouble nombre, int positionDepart) {
-		int positionCourante = positionDepart;
-		boolean continuerPropagation = true;
+		int position = positionDepart;
 
-		while (positionCourante > 0 && doitArrondiSuperieur(nombre.dec, positionCourante) && continuerPropagation) {
-			int chiffrePrecedent = Character.getNumericValue(nombre.dec.charAt(positionCourante - 1)) + 1;
-			String chiffreIncrement = "" + chiffrePrecedent;
-
-			if (chiffreIncrement.length() > 1) {
-				nombre.dec = nombre.dec.substring(0, positionCourante);
+		while (position > 0 && doitArrondiSuperieur(nombre.partieDecimaleStr, position)) {
+			String nouvellePartie = traiterChiffrePropagation(nombre.partieDecimaleStr, position);
+			nombre.partieDecimaleStr = nouvellePartie;
+			if (nouvellePartie.length() < position) {
+				position--;
 			} else {
-				nombre.dec = nombre.dec.substring(0, positionCourante - 1) + chiffreIncrement;
-				continuerPropagation = false;
+				break;
 			}
-			positionCourante--;
 		}
 
-		if (positionCourante == 0 && doitArrondiSuperieur(nombre.dec, 0)) {
-			nombre.dec = "";
-			nombre.ent = "" + (Integer.parseInt(nombre.ent) + 1);
+		if (position == 0 && doitArrondiSuperieur(nombre.partieDecimaleStr, 0)) {
+			nombre.partieDecimaleStr = "";
+			nombre.partieEntiereStr = "" + (Integer.parseInt(nombre.partieEntiereStr) + 1);
 		}
-
 		return nombre;
 	}
 
@@ -687,58 +817,66 @@ class CalculsDouble {
 		if (nombreDecimales < 1) {
 			return arrondirSansDecimales(nombre);
 		}
-		if (nombre.dec.isEmpty()) {
+		if (nombre.partieDecimaleStr.isEmpty()) {
 			return nombre;
 		}
-		if (nombre.dec.length() <= nombreDecimales) {
+		if (nombre.partieDecimaleStr.length() <= nombreDecimales) {
 			return nombre;
 		}
-		if (!doitArrondiSuperieur(nombre.dec, nombreDecimales)) {
-			nombre.dec = nombre.dec.substring(0, nombreDecimales);
+		if (!doitArrondiSuperieur(nombre.partieDecimaleStr, nombreDecimales)) {
+			nombre.partieDecimaleStr = nombre.partieDecimaleStr.substring(0, nombreDecimales);
 			return nombre;
 		}
 
 		return propagerArrondiDecimales(nombre, nombreDecimales);
 	}
 
-	public String partieDecimale (double n0) {
-		String n0tmp = ""+n0;
-		String point=".";
-
-		//n0tmp = "16575.76812"; //test pour ',' ou '.'
-
-		if (n0tmp.indexOf(",")!= -1) point=",";
-		if(n0tmp.indexOf(point)== -1) return "0";
-
-		boolean aTrouveLePoint=false;
-		String res="";
-		int lenn0tmp=n0tmp.length();
-		for (int i=0; i<lenn0tmp; i++) {
-			if (aTrouveLePoint) res+=n0tmp.charAt(i);
-			if (n0tmp.charAt(i)==point.charAt(0)) aTrouveLePoint=true;
-		}
-
-		//aff("res = "+res);
-
-		return res;
+	/**
+	 * Detecte le separateur decimal dans une chaine.
+	 * @param nombreChaine Representation du nombre.
+	 * @return Separateur trouve ('.' ou ',').
+	 */
+	private char detecterSeparateurDecimal(String nombreChaine) {
+		if (nombreChaine.indexOf(",") != -1) return ',';
+		return '.';
 	}
 
-	public CalculsDouble [] egaliseNombres  (CalculsDouble a, CalculsDouble b) {
-		if (a.dec.length()!=b.dec.length()) {
-			if (Math.max(a.dec.length(), b.dec.length())==a.dec.length()) {
+	/**
+	 * Extrait la partie decimale d un double sous forme de chaine.
+	 * @param nombre Nombre decimal.
+	 * @return Partie decimale sans le point.
+	 */
+	public String partieDecimale(double nombre) {
+		String nombreChaine = "" + nombre;
+		char separateur = detecterSeparateurDecimal(nombreChaine);
+		int positionSeparateur = nombreChaine.indexOf(separateur);
+
+		if (positionSeparateur == -1) return "0";
+		return nombreChaine.substring(positionSeparateur + 1);
+	}
+
+	/**
+	 * Egalise le nombre de decimales de deux CalculsDouble.
+	 * @param a Premier nombre.
+	 * @param b Second nombre.
+	 * @return Tableau des deux nombres avec decimales egalisees.
+	 */
+	public CalculsDouble[] egaliseNombres(CalculsDouble a, CalculsDouble b) {
+		if (a.partieDecimaleStr.length()!=b.partieDecimaleStr.length()) {
+			if (Math.max(a.partieDecimaleStr.length(), b.partieDecimaleStr.length())==a.partieDecimaleStr.length()) {
 				String tmpa="";
-				int tmplena=a.dec.length()-b.dec.length();
+				int tmplena=a.partieDecimaleStr.length()-b.partieDecimaleStr.length();
 				for (int i=0; i<tmplena; i++)
 					tmpa+="0";
-				b.dec+=tmpa;
+				b.partieDecimaleStr+=tmpa;
 			}
 
-			if (Math.max(a.dec.length(), b.dec.length())==b.dec.length()) {
+			if (Math.max(a.partieDecimaleStr.length(), b.partieDecimaleStr.length())==b.partieDecimaleStr.length()) {
 				String tmpb="";
-				int tmplenb=b.dec.length()-a.dec.length();
+				int tmplenb=b.partieDecimaleStr.length()-a.partieDecimaleStr.length();
 				for (int i=0; i<tmplenb; i++)
 					tmpb+="0";
-				a.dec+=tmpb;
+				a.partieDecimaleStr+=tmpb;
 			}
 		}
 
@@ -747,30 +885,36 @@ class CalculsDouble {
 		return res;
 	}
 	/**
-		Copie un CalculsDouble dans un autre.
-	**/
-	public CalculsDouble copie (CalculsDouble a) {
+	 * Copie un CalculsDouble dans un nouveau.
+	 * @param a Nombre a copier.
+	 * @return Copie independante.
+	 */
+	public CalculsDouble copie(CalculsDouble a) {
 		CalculsDouble res = new CalculsDouble(0);
 
-		res.ent = a.ent;
-		res.dec = a.dec;
+		res.partieEntiereStr = a.partieEntiereStr;
+		res.partieDecimaleStr = a.partieDecimaleStr;
 		res.estNegatif = a.estNegatif;
 		res.representation_anglaise = a.representation_anglaise;
 
 		return res;
 	}
 
-	public boolean equals (CalculsDouble a) {
+	/**
+	 * Verifie l egalite avec un autre CalculsDouble.
+	 * @param a Nombre a comparer.
+	 * @return true si egaux.
+	 */
+	public boolean equals(CalculsDouble a) {
 		return (compareNombres(this, a)==0);
 	}
 	/**
-		0 : identiques
-		1 : a>b
-		2 : b>a
-
-		-1 : erreur
-	**/
-	public int compareNombres (CalculsDouble a, CalculsDouble b) {
+	 * Compare deux CalculsDouble.
+	 * @param a Premier nombre.
+	 * @param b Second nombre.
+	 * @return 0 si egaux, 1 si a > b, 2 si b > a, -1 si erreur.
+	 */
+	public int compareNombres(CalculsDouble a, CalculsDouble b) {
 		int tmp = -1;
 		if (a.estNegatif && !b.estNegatif) return 2;
 		if (!a.estNegatif && b.estNegatif) return 1;
@@ -790,45 +934,71 @@ class CalculsDouble {
 	}
 
 	/**
-		Compare nombre avec valeur la absolue de a et de b : 
-
-		0 : identiques
-		1 : a>b
-		2 : b>a
-	**/
-	public int compareNombres_abs (CalculsDouble a, CalculsDouble b) {
-		int res=0;
-
-		if (a.ent.length()>b.ent.length()) return 1;
-		if (a.ent.length()<b.ent.length()) return 2;
-
-		// donc a.ent.length() == b.ent.length()
-		int alen = a.ent.length();
-
-		for (int i=0;  i<alen;  i++) {
-			if (Integer.parseInt(""+a.ent.charAt(i))>Integer.parseInt(""+b.ent.charAt(i)))
-				return 1;
-			if (Integer.parseInt(""+a.ent.charAt(i))<Integer.parseInt(""+b.ent.charAt(i)))
-				return 2;
+	 * Compare deux chaines chiffre par chiffre.
+	 * @param chaineA Premiere chaine.
+	 * @param chaineB Seconde chaine.
+	 * @param longueur Nombre de caracteres a comparer.
+	 * @return 0 si egaux, 1 si A > B, 2 si B > A.
+	 */
+	private int comparerChiffresParChiffres(String chaineA, String chaineB, int longueur) {
+		for (int index = 0; index < longueur; index++) {
+			int chiffreA = Integer.parseInt("" + chaineA.charAt(index));
+			int chiffreB = Integer.parseInt("" + chaineB.charAt(index));
+			if (chiffreA > chiffreB) return 1;
+			if (chiffreA < chiffreB) return 2;
 		}
-
-		// donc les parties entières sont identiques
-		int xlen = Math.min(a.dec.length(), b.dec.length());
-		for (int i=0;  i<xlen;  i++) {
-			if (Integer.parseInt(""+a.dec.charAt(i))>Integer.parseInt(""+b.dec.charAt(i)))
-				return 1;
-			if (Integer.parseInt(""+a.dec.charAt(i))<Integer.parseInt(""+b.dec.charAt(i)))
-				return 2;
-		}
-
-		if (a.dec.length()!=b.dec.length() && Math.max(a.dec.length(), b.dec.length())>xlen) {
-			if (a.dec.length()>xlen)
-				if (Integer.parseInt(""+a.dec.charAt(xlen))>0) return 1;
-			if (b.dec.length()>xlen)
-				if (Integer.parseInt(""+b.dec.charAt(xlen))>0) return 2;
-		}
-
 		return 0;
+	}
+
+	/**
+	 * Compare les longueurs des parties entieres.
+	 * @param longueurA Longueur partie entiere A.
+	 * @param longueurB Longueur partie entiere B.
+	 * @return 0 si egaux, 1 si A > B, 2 si B > A.
+	 */
+	private int comparerLongueurs(int longueurA, int longueurB) {
+		if (longueurA > longueurB) return 1;
+		if (longueurA < longueurB) return 2;
+		return 0;
+	}
+
+	/**
+	 * Compare les valeurs absolues de deux CalculsDouble.
+	 * @param nombreA Premier nombre.
+	 * @param nombreB Second nombre.
+	 * @return 0 si egaux, 1 si |a| > |b|, 2 si |b| > |a|.
+	 */
+	public int compareNombres_abs(CalculsDouble nombreA, CalculsDouble nombreB) {
+		int resultatLongueur = comparerLongueurs(nombreA.partieEntiereStr.length(), nombreB.partieEntiereStr.length());
+		if (resultatLongueur != 0) return resultatLongueur;
+
+		int resultatEntier = comparerChiffresParChiffres(nombreA.partieEntiereStr, nombreB.partieEntiereStr, nombreA.partieEntiereStr.length());
+		if (resultatEntier != 0) return resultatEntier;
+
+		int longueurMin = Math.min(nombreA.partieDecimaleStr.length(), nombreB.partieDecimaleStr.length());
+		int resultatDecimal = comparerChiffresParChiffres(nombreA.partieDecimaleStr, nombreB.partieDecimaleStr, longueurMin);
+		if (resultatDecimal != 0) return resultatDecimal;
+
+		if (nombreA.partieDecimaleStr.length() > longueurMin) {
+			if (Integer.parseInt("" + nombreA.partieDecimaleStr.charAt(longueurMin)) > 0) return 1;
+		}
+		if (nombreB.partieDecimaleStr.length() > longueurMin) {
+			if (Integer.parseInt("" + nombreB.partieDecimaleStr.charAt(longueurMin)) > 0) return 2;
+		}
+		return 0;
+	}
+
+	/**
+	 * Detecte un facteur rapide (2, 3, 5) selon le dernier chiffre.
+	 * @param nombre Nombre a tester.
+	 * @return Facteur detecte ou -1 si aucun.
+	 */
+	private int detecterFacteurRapide(int nombre) {
+		char dernierChiffre = ("" + nombre).charAt(("" + nombre).length() - 1);
+		if (dernierChiffre == '0' || dernierChiffre == '5') return 5;
+		if (dernierChiffre == '2' || dernierChiffre == '4' || dernierChiffre == '8') return 2;
+		if (nombre % 3 == 0) return 3;
+		return -1;
 	}
 
 	/**
@@ -837,23 +1007,11 @@ class CalculsDouble {
 	 * @return Le facteur premier trouve.
 	 */
 	private int trouverProchainFacteurPremier(int nombre) {
-		String nombreChaine = "" + nombre;
-		char dernierChiffre = nombreChaine.charAt(nombreChaine.length() - 1);
-
-		if (dernierChiffre == '0' || dernierChiffre == '5') {
-			return 5;
-		}
-		if (dernierChiffre == '2' || dernierChiffre == '4' || dernierChiffre == '8') {
-			return 2;
-		}
-		if (nombre % 3 == 0) {
-			return 3;
-		}
+		int facteurRapide = detecterFacteurRapide(nombre);
+		if (facteurRapide != -1) return facteurRapide;
 
 		for (int diviseur = 2; diviseur < nombre; diviseur++) {
-			if (nombre % diviseur == 0) {
-				return diviseur;
-			}
+			if (nombre % diviseur == 0) return diviseur;
 		}
 		return nombre;
 	}
@@ -890,14 +1048,14 @@ class CalculsDouble {
 	 * @return Tableau des facteurs premiers ou null si invalide.
 	 */
 	public int[] decompose_en_facteurs_premiers(CalculsDouble nombre) {
-		if (!nombre.dec.isEmpty()) {
+		if (!nombre.partieDecimaleStr.isEmpty()) {
 			aff("Partie decimale ignoree, troncature entiere utilisee.");
 		}
-		if (nombre.ent.isEmpty()) {
+		if (nombre.partieEntiereStr.isEmpty()) {
 			return null;
 		}
 
-		int valeurCourante = Integer.parseInt(nombre.ent);
+		int valeurCourante = Integer.parseInt(nombre.partieEntiereStr);
 		StringBuilder facteursChaine = new StringBuilder();
 
 		aff("n = " + valeurCourante);
@@ -927,7 +1085,12 @@ class CalculsDouble {
 
 
 
-	public int somme_des_chiffres (String n0) {
+	/**
+	 * Calcule la somme des chiffres d un nombre.
+	 * @param n0 Nombre sous forme de chaine.
+	 * @return Somme des chiffres.
+	 */
+	public int somme_des_chiffres(String n0) {
 		int i, n0len = n0.length(), res=0;
 		if (n0.isEmpty()) return 0; // rien à traiter si n0="".
 
@@ -938,7 +1101,12 @@ class CalculsDouble {
 		return res;
 	}
 
-	public int produit_des_chiffres (String n0) {
+	/**
+	 * Calcule le produit des chiffres d un nombre.
+	 * @param n0 Nombre sous forme de chaine.
+	 * @return Produit des chiffres ou 0 si vide.
+	 */
+	public int produit_des_chiffres(String n0) {
 		int i, n0len = n0.length(), res=1;
 		if (n0.isEmpty()) return 0; // rien à traiter si n0="".
 
@@ -948,7 +1116,12 @@ class CalculsDouble {
 
 		return res;
 	}
-	public boolean estPremier (int n0) {
+	/**
+	 * Verifie si un entier est premier.
+	 * @param n0 Entier a tester.
+	 * @return true si n0 est premier.
+	 */
+	public boolean estPremier(int n0) {
 		for (int i=2; i<1+(int)(Math.sqrt((double)(n0))); i++) {
 			if (n0%i==0) return false;
 		}
@@ -956,38 +1129,53 @@ class CalculsDouble {
 		return true;
 	}
 
-	public void clacule_n_premiers (int n0) {
-		int i, cmp=0;
+	/**
+	 * Genere un tableau des n premiers nombres premiers.
+	 * @param quantite Nombre de premiers a generer.
+	 * @return Tableau des nombres premiers.
+	 */
+	private int[] genererTableauPremiers(int quantite) {
+		int[] premiers = new int[quantite];
+		int compteur = 0;
+		int candidat = 2;
 
-		if (n0<1) return; // rien à afficher
-
-		int [] res = new int[n0];
-
-		i=2;
-		while (cmp<n0) {
-			if (estPremier(i)) {
-				res[cmp] = i;
-				cmp++;
+		while (compteur < quantite) {
+			if (estPremier(candidat)) {
+				premiers[compteur] = candidat;
+				compteur++;
 			}
-
-			i++;
+			candidat++;
 		}
-
-		affnn("p"+n0+" = {");
-		for (i=0; i<res.length-1; i++) {
-			affnn(res[i]+", ");
-		}
-		aff(res[i]+"};");
+		return premiers;
 	}
 
-// ######################### Fonctions utilitaires ##################################### //
+	/**
+	 * Calcule et affiche les n premiers nombres premiers.
+	 * @param quantite Nombre de premiers a calculer.
+	 */
+	public void clacule_n_premiers(int quantite) {
+		if (quantite < 1) return;
+
+		int[] premiers = genererTableauPremiers(quantite);
+
+		affnn("p" + quantite + " = {");
+		for (int index = 0; index < premiers.length - 1; index++) {
+			affnn(premiers[index] + ", ");
+		}
+		aff(premiers[premiers.length - 1] + "};");
+	}
+
+// ==============================================================================
+// Fonctions utilitaires
+// ==============================================================================
 
 
 	/**
-		Shows if a String is an Integer 
-		using function Integer.parseInt(String) of Java.
-	**/
-	public boolean isInteger (String n0) {
+	 * Verifie si une chaine represente un entier valide.
+	 * @param n0 Chaine a tester.
+	 * @return true si parsable en entier.
+	 */
+	public boolean isInteger(String n0) {
 		try {
 			int n1 = Integer.parseInt(n0);
 			return true;
@@ -998,9 +1186,11 @@ class CalculsDouble {
 	}
 
 	/**
-		Convertit un String en entier (gestion des exceptions).
-	**/
-	public int convertStrInt (String n0) {
+	 * Convertit une chaine en entier avec gestion des erreurs.
+	 * @param n0 Chaine a convertir.
+	 * @return Entier ou -1 si erreur.
+	 */
+	public int convertStrInt(String n0) {
 		if (n0==null) {
 			aff("n0 est null");
 			return -1;
@@ -1019,14 +1209,20 @@ class CalculsDouble {
 	}
 
 	/**
-		Vérifie si un char est un chiffre 
-		ou non.
-	**/
-	public boolean isCharNumber (char n0) {
+	 * Verifie si un caractere est un chiffre.
+	 * @param n0 Caractere a tester.
+	 * @return true si chiffre (0-9).
+	 */
+	public boolean isCharNumber(char n0) {
 		return (n0>='0' && n0<='9');
 	}
 
-	public boolean isInteger_deep (String n0) {
+	/**
+	 * Verifie caractere par caractere si une chaine est un entier.
+	 * @param n0 Chaine a tester.
+	 * @return true si tous les caracteres sont des chiffres.
+	 */
+	public boolean isInteger_deep(String n0) {
 		if (n0.isEmpty()) return false;
 		int n0len = n0.length();
 
@@ -1038,15 +1234,15 @@ class CalculsDouble {
 	}
 
 	/**
-		Regarde si CalculsDouble n0 est un nombre.
-		Renvoie true si n0.ent est un nombre
-		et que n0.dec est vide ou un nombre aussi.
-	**/
-	public boolean isInteger (CalculsDouble n0) {
+	 * Verifie si un CalculsDouble est valide numeriquement.
+	 * @param n0 Nombre a tester.
+	 * @return true si parties entiere et decimale sont valides.
+	 */
+	public boolean isInteger(CalculsDouble n0) {
 		boolean res = false;
 		int i=0;
-		String n0ent = n0.ent;
-		String n0dec = n0.dec;
+		String n0ent = n0.partieEntiereStr;
+		String n0dec = n0.partieDecimaleStr;
 
 		if (!n0ent.isEmpty()) {
 			res = isInteger(n0ent);
@@ -1059,33 +1255,38 @@ class CalculsDouble {
 	}
 
 	/**
-		Renvoie true si n0=0.0
-		ou 0.
-	**/
-	public boolean estNul (CalculsDouble n0) {
-		int i=0;
-		int n0entlen = n0.ent.length();
-		int n0declen = 0;
-
-		if (!isInteger(n0)) return false;
-
-		if (!n0.dec.isEmpty())
-			n0declen = n0.dec.length();
-
-		for (i=0; i<n0entlen; i++) {
-			if (n0.ent.charAt(i)!='0')
+	 * Verifie si une chaine ne contient que des zeros.
+	 * @param chaine Chaine a tester.
+	 * @return true si uniquement des zeros.
+	 */
+	private boolean contientUniquementZeros(String chaine) {
+		for (int index = 0; index < chaine.length(); index++) {
+			if (chaine.charAt(index) != '0') {
 				return false;
+			}
 		}
-
-		for (i=0; i<n0declen; i++) {
-			if (n0.dec.charAt(i)!='0')
-				return false;
-		}
-
 		return true;
 	}
 
-	public int compteOcurrences (String test, char cc) {
+	/**
+	 * Verifie si un CalculsDouble vaut zero.
+	 * @param nombre Nombre a tester.
+	 * @return true si nombre = 0.
+	 */
+	public boolean estNul(CalculsDouble nombre) {
+		if (!isInteger(nombre)) return false;
+		if (!contientUniquementZeros(nombre.partieEntiereStr)) return false;
+		if (!nombre.partieDecimaleStr.isEmpty() && !contientUniquementZeros(nombre.partieDecimaleStr)) return false;
+		return true;
+	}
+
+	/**
+	 * Compte les occurrences d un caractere dans une chaine.
+	 * @param test Chaine a analyser.
+	 * @param cc Caractere a compter.
+	 * @return Nombre d occurrences.
+	 */
+	public int compteOcurrences(String test, char cc) {
 		if (test==null) return 0;
 		if (test.isEmpty()) return 0;
 		// Gestion des erreurs
@@ -1098,27 +1299,49 @@ class CalculsDouble {
 	}
 
 
-	public static void affnn (Object s0) {
+	/**
+	 * Affiche un objet sans retour a la ligne.
+	 * @param s0 Objet a afficher.
+	 */
+	public static void affnn(Object s0) {
 		System.out.print(""+s0);
 	}
 
-	public static void aff (Object s0) {
+	/**
+	 * Affiche un objet avec retour a la ligne.
+	 * @param s0 Objet a afficher.
+	 */
+	public static void aff(Object s0) {
 		System.out.println(""+s0);
 	}
 
-	public void affTab(int [] n0) {
+	/**
+	 * Affiche un tableau d entiers.
+	 * @param n0 Tableau a afficher.
+	 */
+	public void affTab(int[] n0) {
 		for (int i=0; i<n0.length; i++) {
 			aff("t["+i+"] = "+n0[i]);
 		}
 	}
 
-	public void affTab(int [] n0, String nom) {
+	/**
+	 * Affiche un tableau d entiers avec un nom.
+	 * @param n0 Tableau a afficher.
+	 * @param nom Nom du tableau.
+	 */
+	public void affTab(int[] n0, String nom) {
 		for (int i=0; i<n0.length; i++) {
 			aff(nom+"["+i+"] = "+n0[i]);
 		}
 	}
 
-	public void afftab2dim(String [] t1, String nom) {
+	/**
+	 * Affiche un tableau de chaines avec un nom.
+	 * @param t1 Tableau a afficher.
+	 * @param nom Nom du tableau.
+	 */
+	public void afftab2dim(String[] t1, String nom) {
 		int i;
 
 		//aff(nom+" : ");
@@ -1128,7 +1351,12 @@ class CalculsDouble {
 		}
 	}
 
-	public int [] agrandieTab (int [] t0) {
+	/**
+	 * Double la taille d un tableau d entiers.
+	 * @param t0 Tableau original.
+	 * @return Nouveau tableau de taille doublee + 1.
+	 */
+	public int[] agrandieTab(int[] t0) {
 		int i;
 		int [] t1 = new int[t0.length*2+1];
 
@@ -1140,26 +1368,38 @@ class CalculsDouble {
 	}
 
 
-// ################################ toString ########################################### //
+// ==============================================================================
+// toString
+// ==============================================================================
 
-	public String toString ()  {
-		String signeMoins="";
-		String affent = ent;
-		String dec = chiffresSignificatifs(this.dec, -1);
-		char virgule = ',';
-		if (representation_anglaise) virgule='.';
-		String affDec=virgule+dec;
-
-		if (affent.isEmpty()) affent = "0";
-
-		if (!dec.isEmpty() && Integer.parseInt(dec)==0 || dec.isEmpty()) affDec="";
-
-		if (estNegatif) signeMoins = "-";
-
-		return (signeMoins+affent+affDec);
+	/**
+	 * Construit le suffixe decimal pour l'affichage.
+	 * @param partieDecimale Partie decimale formatee.
+	 * @param virgule Caractere separateur.
+	 * @return Suffixe decimal ou chaine vide.
+	 */
+	private String construireSuffixeDecimal(String partieDecimale, char virgule) {
+		if (partieDecimale.isEmpty()) return "";
+		if (Integer.parseInt(partieDecimale) == 0) return "";
+		return virgule + partieDecimale;
 	}
 
-// ######################## Reconnaissance opérations ################################## //
+	/**
+	 * Convertit le CalculsDouble en chaine lisible.
+	 * @return Representation textuelle du nombre.
+	 */
+	public String toString() {
+		String partieEntiere = partieEntiereStr.isEmpty() ? "0" : partieEntiereStr;
+		String partieDecimale = chiffresSignificatifs(this.partieDecimaleStr, -1);
+		char virgule = representation_anglaise ? '.' : ',';
+		String suffixe = construireSuffixeDecimal(partieDecimale, virgule);
+		String signe = estNegatif ? "-" : "";
+		return signe + partieEntiere + suffixe;
+	}
+
+// ==============================================================================
+// Reconnaissance opérations
+// ==============================================================================
 
 
 	Character [] operateurs_tmp = 
@@ -1167,51 +1407,87 @@ class CalculsDouble {
 	Stack<String> st = new Stack<String>();
 	ArrayList<Character> operateurs = new ArrayList<Character>();
 
-	public void operateurs () {
+	/**
+	 * Initialise la liste des operateurs reconnus.
+	 */
+	public void operateurs() {
 		for (Character c1 : operateurs_tmp) {
 			operateurs.add(c1);
 		}
 	}
 
 	/**
-		Renvoie -1 en cas d'erreur.
-	**/
-	public int analyse_expression_sans_parentheses (String expr) {
-		if (expr==null) {
+	 * Valide une expression (non null, non vide).
+	 * @param expression Expression a valider.
+	 * @return true si valide, false sinon.
+	 */
+	private boolean validerExpression(String expression) {
+		if (expression == null) {
 			aff("L'expression est null");
-			return -1;
+			return false;
 		}
-		if (expr.isEmpty()) {
+		if (expression.isEmpty()) {
 			aff("L'expression est vide.");
-			return -1;
+			return false;
 		}
-		int lenexpr = expr.length();
-		int cmp = 0;
-		String tmp = "";
-
-		for (int i=0; i<lenexpr; i++) {
-			if (isCharNumber(expr.charAt(i))) {
-				//affnn(expr.charAt(i));
-				tmp = mange_nombre(expr, i);
-				st.push(tmp);
-				while (i<lenexpr 
-				&& isCharNumber(expr.charAt(i))) i++;
-			}
-			if (cmp>0) calcul_pile(st);
-			if (i>=lenexpr) break;
-			if (operateurs.contains(expr.charAt(i))) {
-				tmp = ""+mange_operateur(expr, i);
-				st.push(tmp);
-			}
-			cmp++;
-		}
-		String res = pop_erreur(st);
-		return convertStrInt(res);
+		return true;
 	}
 
-// ##################### Fonctions de traitement des symboles ######################### //
+	/**
+	 * Traite un token (nombre ou operateur) dans l'expression.
+	 * @param expression Expression source.
+	 * @param position Position actuelle.
+	 * @param compteur Compteur d'iterations.
+	 * @return Nouvelle position apres traitement.
+	 */
+	private int traiterTokenExpression(String expression, int position, int compteur) {
+		if (isCharNumber(expression.charAt(position))) {
+			String nombre = mange_nombre(expression, position);
+			st.push(nombre);
+			while (position < expression.length() && isCharNumber(expression.charAt(position))) {
+				position++;
+			}
+		}
+		if (compteur > 0) {
+			calcul_pile(st);
+		}
+		if (position < expression.length() && operateurs.contains(expression.charAt(position))) {
+			String operateur = "" + mange_operateur(expression, position);
+			st.push(operateur);
+		}
+		return position;
+	}
 
-	public String pop_erreur (Stack<String> st) {
+	/**
+	 * Analyse une expression arithmetique sans parentheses.
+	 * @param expression Expression a analyser.
+	 * @return Resultat du calcul ou -1 si erreur.
+	 */
+	public int analyse_expression_sans_parentheses(String expression) {
+		if (!validerExpression(expression)) {
+			return -1;
+		}
+
+		int compteur = 0;
+		for (int position = 0; position < expression.length(); position++) {
+			position = traiterTokenExpression(expression, position, compteur);
+			if (position >= expression.length()) break;
+			compteur++;
+		}
+		String resultat = pop_erreur(st);
+		return convertStrInt(resultat);
+	}
+
+// ==============================================================================
+// Fonctions de traitement des symboles
+// ==============================================================================
+
+	/**
+	 * Depile un element avec gestion d erreur.
+	 * @param st Pile source.
+	 * @return Element depile ou chaine vide si pile vide.
+	 */
+	public String pop_erreur(Stack<String> st) {
 		if (!st.empty()) {
 			return st.pop();
 		}
@@ -1221,7 +1497,11 @@ class CalculsDouble {
 		}
 	}
 
-	public void calcul_pile (Stack<String> st) {
+	/**
+	 * Effectue un calcul avec les trois premiers elements de la pile.
+	 * @param st Pile contenant operandes et operateur.
+	 */
+	public void calcul_pile(Stack<String> st) {
 		String aS = pop_erreur(st);
 		String symS = pop_erreur(st);
 		String bS = pop_erreur(st);
@@ -1232,164 +1512,259 @@ class CalculsDouble {
 	}
 
 	/**
-		Retourne -1 en cas d'erreur.
-	**/
-	public int traite_symbolesInt (String aS, String bS, String symS) {
-		if (symS==null || symS.isEmpty()) {
-			aff("Symbole null ou egal a "+'"'+'"'+".");
-			return -1;
+	 * Valide les entrees pour traite_symbolesInt.
+	 * @param operandeA Premier operande.
+	 * @param operandeB Second operande.
+	 * @param operateur Operateur.
+	 * @return true si valide, false sinon.
+	 */
+	private boolean validerEntreesSymbolesInt(String operandeA, String operandeB, String operateur) {
+		if (operateur == null || operateur.isEmpty()) {
+			aff("Symbole null ou egal a " + '"' + '"' + ".");
+			return false;
 		}
-		if (!isInteger(aS) || !isInteger(bS)) {
-			aff("aS (= "+aS+") ou bS (= "+bS+") ne sont pas des nombres.");
-			return -1;
+		if (!isInteger(operandeA) || !isInteger(operandeB)) {
+			aff("operandeA (= " + operandeA + ") ou operandeB (= " + operandeB + ") ne sont pas des nombres.");
+			return false;
 		}
-		int a = Integer.parseInt(aS);
-		int b = Integer.parseInt(bS);
-		char sym = symS.charAt(0);
-		if (!operateurs.contains(sym)) {
-			aff("sym (= "+sym+") n'est pas un operateur.");
-			return -1;
-		}
-		int res = 0;
-
-		if (sym=='+') {
-			res = a+b;
-		}
-
-		if (sym=='-') {
-			res = a-b;
-		}
-
-		if (sym=='*') {
-			res = a*b;
-		}
-
-		if (sym=='/') {
-			res = a/b;
-		}
-
-		return res;
-	}
-
-// ########################### Fonction mange_symbole ################################# //
-
-	public String verifie_double_correcte (String nombre, char sym) {
-		if (nombre==null) {
-			aff("Le nombre est null.");
-			return "";
-		}
-		if (nombre.isEmpty()) {
-			aff("Le nombre est vide.");
-			return "";
-		}
-		// Gestion des erreurs
-		char sym2 = '.';
-		if (sym=='.') sym2 = ',';
-		String [] double_tmp = nombre.split(""+sym);
-		if (double_tmp==null) return "";
-		if (double_tmp.length==1) {
-			if (double_tmp[0]==null) return "";
-			if (double_tmp[0].isEmpty()) return "";
-			if (double_tmp[0].equals(",")) return "";
-			return nombre.replace(""+sym, "");
-		}
-		if (double_tmp.length<2) return "";
-		// Gestion des erreurs avec le nombre.split(sym).
-
-		String tmp = double_tmp[1];
-		int lentmp = tmp.length();
-		
-		for (int i=0; i<lentmp; i++) {
-			if (i%3==0) {
-				if (tmp.charAt(i)!=sym2) return "";
-			}
-			else {
-				if (!isCharNumber(tmp.charAt(i)))
-					return "";
-			}
-		}
-		return double_tmp[0]+tmp.replace(""+sym2, "");
+		return true;
 	}
 
 	/**
-		Retourne -1 en cas d'erreur.
-	**/
-	public double analyse_nombreDouble (String nombre) {
-		int i = 0;
-		int nbr_virgules = 0, nbr_points = 0;
-		boolean virgule = false;
-		boolean point = false;
-
-		nbr_virgules = compteOcurrences(nombre, ',');
-		nbr_points = compteOcurrences(nombre, '.');
-
-		aff("nbr_virgules = "+nbr_virgules);
-		aff("nbr_points = "+nbr_points);
-
-		if (nbr_virgules==0 && nbr_points==0) {
-			if (isInteger(nombre)) {
-				return Integer.parseInt(nombre);
-			}
-		}
-		else {
-			if (nbr_virgules==1 && nbr_points>1) {
-				nombre = verifie_double_correcte (nombre, ',');
-			}
-
-			if (nbr_virgules>1 && nbr_points==1) {
-				nombre = verifie_double_correcte (nombre, '.');
-			}
-
-			nbr_virgules = compteOcurrences(nombre, ',');
-			nbr_points = compteOcurrences(nombre, '.');
-
-			aff("nbr_virgules = "+nbr_virgules);
-			aff("nbr_points = "+nbr_points);
-			aff("nombre = "+nombre);
-
-			if (nbr_virgules>1 && nbr_points>1)
-				return -1;
-			if (nbr_virgules==1 && nbr_points==0) {
-				return Double.parseDouble(
-				nombre.replace(',', '.'));
-			}
-			if (nbr_virgules==0 && nbr_points==1) {
-				return Double.parseDouble(nombre);	
-			}
-		}
-		return -1;		
+	 * Calcule le resultat d'une operation entiere.
+	 * @param valeurA Premiere valeur.
+	 * @param valeurB Seconde valeur.
+	 * @param symbole Operateur.
+	 * @return Resultat du calcul.
+	 */
+	private int calculerOperationEntiere(int valeurA, int valeurB, char symbole) {
+		if (symbole == '+') return valeurA + valeurB;
+		if (symbole == '-') return valeurA - valeurB;
+		if (symbole == '*') return valeurA * valeurB;
+		if (symbole == '/') return valeurA / valeurB;
+		return 0;
 	}
 
-	public String mange_nombre (String expr, int indice_debut) {
-		int lenexpr = expr.length();
-		boolean virgules = false;
-		boolean points = false;
-		boolean isDigit = true;
-		String res = "";
+	/**
+	 * Applique un operateur sur deux operandes.
+	 * @param operandeA Premier operande.
+	 * @param operandeB Second operande.
+	 * @param operateurStr Operateur.
+	 * @return Resultat ou -1 si erreur.
+	 */
+	public int traite_symbolesInt(String operandeA, String operandeB, String operateurStr) {
+		if (!validerEntreesSymbolesInt(operandeA, operandeB, operateurStr)) {
+			return -1;
+		}
 
-		for (int i=indice_debut; i<lenexpr && isDigit; i++) {
-			if (isCharNumber(expr.charAt(i))) {
-				res+=expr.charAt(i);
-			}
-			if (expr.charAt(i)==',') {
-				virgules = true;
-				res+=expr.charAt(i);
-			}
-			if (expr.charAt(i)=='.') {
-				points = true;
-				res+=expr.charAt(i);
-			}
-			else isDigit = false;
+		char symbole = operateurStr.charAt(0);
+		if (!operateurs.contains(symbole)) {
+			aff("symbole (= " + symbole + ") n'est pas un operateur.");
+			return -1;
 		}
-		aff(res);
-		if (virgules || points) {
-			res = ""+analyse_nombreDouble(res);
-			return res;
-		}
-		else return res;
+
+		int valeurA = Integer.parseInt(operandeA);
+		int valeurB = Integer.parseInt(operandeB);
+		return calculerOperationEntiere(valeurA, valeurB, symbole);
 	}
 
-	public char mange_operateur (String expr, int indice) {
+// ==============================================================================
+// Fonction mange_symbole
+// ==============================================================================
+
+	/**
+	 * Verifie si un nombre est null ou vide.
+	 * @param nombre Nombre a verifier.
+	 * @return true si invalide, false sinon.
+	 */
+	private boolean estNombreInvalide(String nombre) {
+		if (nombre == null) {
+			aff("Le nombre est null.");
+			return true;
+		}
+		if (nombre.isEmpty()) {
+			aff("Le nombre est vide.");
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Verifie le format des milliers dans la partie decimale.
+	 * @param partieDecimale Partie apres le separateur.
+	 * @param separateurMilliers Separateur de milliers.
+	 * @return true si format valide, false sinon.
+	 */
+	private boolean verifierFormatMilliers(String partieDecimale, char separateurMilliers) {
+		int longueur = partieDecimale.length();
+		for (int index = 0; index < longueur; index++) {
+			if (index % 3 == 0) {
+				if (partieDecimale.charAt(index) != separateurMilliers) {
+					return false;
+				}
+			} else {
+				if (!isCharNumber(partieDecimale.charAt(index))) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Verifie et nettoie un nombre decimal avec separateurs.
+	 * @param nombre Nombre a verifier.
+	 * @param separateurDecimal Separateur decimal utilise.
+	 * @return Nombre nettoye ou chaine vide si invalide.
+	 */
+	public String verifie_double_correcte(String nombre, char separateurDecimal) {
+		if (estNombreInvalide(nombre)) {
+			return "";
+		}
+
+		char separateurMilliers = (separateurDecimal == '.') ? ',' : '.';
+		String[] parties = nombre.split("" + separateurDecimal);
+
+		if (parties == null || parties.length < 1) {
+			return "";
+		}
+		if (parties.length == 1) {
+			if (parties[0] == null || parties[0].isEmpty() || parties[0].equals(",")) {
+				return "";
+			}
+			return nombre.replace("" + separateurDecimal, "");
+		}
+
+		String partieDecimale = parties[1];
+		if (!verifierFormatMilliers(partieDecimale, separateurMilliers)) {
+			return "";
+		}
+		return parties[0] + partieDecimale.replace("" + separateurMilliers, "");
+	}
+
+	/**
+	 * Analyse un nombre sans separateur decimal.
+	 * @param nombre Chaine a analyser.
+	 * @return Entier parse ou -1 si invalide.
+	 */
+	private double analyserNombreSansSeparateur(String nombre) {
+		if (isInteger(nombre)) {
+			return Integer.parseInt(nombre);
+		}
+		return -1;
+	}
+
+	/**
+	 * Nettoie un nombre avec separateurs mixtes.
+	 * @param nombre Chaine a nettoyer.
+	 * @param nombreVirgules Nombre de virgules.
+	 * @param nombrePoints Nombre de points.
+	 * @return Nombre nettoye.
+	 */
+	private String nettoyerSeparateurs(String nombre, int nombreVirgules, int nombrePoints) {
+		if (nombreVirgules == 1 && nombrePoints > 1) {
+			return verifie_double_correcte(nombre, ',');
+		}
+		if (nombreVirgules > 1 && nombrePoints == 1) {
+			return verifie_double_correcte(nombre, '.');
+		}
+		return nombre;
+	}
+
+	/**
+	 * Parse un nombre avec separateur decimal.
+	 * @param nombre Chaine a parser.
+	 * @param nombreVirgules Nombre de virgules.
+	 * @param nombrePoints Nombre de points.
+	 * @return Double parse ou -1 si invalide.
+	 */
+	private double parserNombreAvecSeparateur(String nombre, int nombreVirgules, int nombrePoints) {
+		if (nombreVirgules > 1 && nombrePoints > 1) {
+			return -1;
+		}
+		if (nombreVirgules == 1 && nombrePoints == 0) {
+			return Double.parseDouble(nombre.replace(',', '.'));
+		}
+		if (nombreVirgules == 0 && nombrePoints == 1) {
+			return Double.parseDouble(nombre);
+		}
+		return -1;
+	}
+
+	/**
+	 * Analyse une chaine et la convertit en double.
+	 * @param nombre Chaine a analyser.
+	 * @return Valeur double ou -1 si erreur.
+	 */
+	public double analyse_nombreDouble(String nombre) {
+		int nombreVirgules = compteOcurrences(nombre, ',');
+		int nombrePoints = compteOcurrences(nombre, '.');
+
+		if (nombreVirgules == 0 && nombrePoints == 0) {
+			return analyserNombreSansSeparateur(nombre);
+		}
+
+		String nombreNettoye = nettoyerSeparateurs(nombre, nombreVirgules, nombrePoints);
+		int virgApresNettoyage = compteOcurrences(nombreNettoye, ',');
+		int ptsApresNettoyage = compteOcurrences(nombreNettoye, '.');
+
+		return parserNombreAvecSeparateur(nombreNettoye, virgApresNettoyage, ptsApresNettoyage);
+	}
+
+	/**
+	 * Extrait les caracteres d'un nombre depuis une expression.
+	 * @param expression Expression source.
+	 * @param debut Position de depart.
+	 * @return Tableau [nombreExtrait, aVirgule, aPoint].
+	 */
+	private Object[] extraireCaracteresNombre(String expression, int debut) {
+		String resultat = "";
+		boolean aVirgule = false;
+		boolean aPoint = false;
+
+		for (int index = debut; index < expression.length(); index++) {
+			char caractere = expression.charAt(index);
+			if (isCharNumber(caractere)) {
+				resultat += caractere;
+			} else if (caractere == ',') {
+				aVirgule = true;
+				resultat += caractere;
+			} else if (caractere == '.') {
+				aPoint = true;
+				resultat += caractere;
+			} else {
+				break;
+			}
+		}
+		return new Object[]{resultat, aVirgule, aPoint};
+	}
+
+	/**
+	 * Extrait un nombre depuis une position dans une expression.
+	 * @param expression Expression source.
+	 * @param indiceDebut Position de depart.
+	 * @return Nombre extrait sous forme de chaine.
+	 */
+	public String mange_nombre(String expression, int indiceDebut) {
+		Object[] extraction = extraireCaracteresNombre(expression, indiceDebut);
+		String nombreExtrait = (String) extraction[0];
+		boolean aVirgule = (Boolean) extraction[1];
+		boolean aPoint = (Boolean) extraction[2];
+
+		aff(nombreExtrait);
+		if (aVirgule || aPoint) {
+			return "" + analyse_nombreDouble(nombreExtrait);
+		}
+		return nombreExtrait;
+	}
+
+	/**
+	 * Extrait un operateur a une position donnee.
+	 * @param expr Expression source.
+	 * @param indice Position de l operateur.
+	 * @return Caractere operateur ou -1 si invalide.
+	 */
+	public char mange_operateur(String expr, int indice) {
 		int lenexpr = expr.length();
 
 		if (indice>=0 && indice<lenexpr) {
@@ -1399,9 +1774,15 @@ class CalculsDouble {
 		else return (char)(-1);
 	}
 	
-// ##################### Main ####################### //
+// ==============================================================================
+// Main
+// ==============================================================================
 
-	public static void main (String [] args) {
+	/**
+	 * Point d entree principal pour les tests.
+	 * @param args Arguments de ligne de commande.
+	 */
+	public static void main(String[] args) {
 		CalculsDouble cb = new CalculsDouble();
 		/**String expr1
 		//"103*8/09+3-8"

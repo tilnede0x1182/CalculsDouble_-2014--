@@ -1,3 +1,55 @@
+~/code/tilnede0x1182/Personnel/2025/Entrainement/projet_fac/CalculsDouble_-2014-- ^ master
+% tree
+.
+├── A_faire.md
+├── Archives
+│   ├── CalculsDouble_modifie.java.backup
+│   ├── python3m1.py
+│   └── READ-ME.txt
+├── build
+├── claude.md
+├── compile.bat
+├── generate_javadoc.bat
+├── Makefile
+├── src
+│   ├── CalculsDouble.java
+│   ├── CalculsDouble_modifie.java
+│   ├── Fonctions_utilitaires
+│   │   ├── Constructeurs.java
+│   │   ├── Fonctions_daffichage.java
+│   │   ├── Fonctions_utilitaires.java
+│   │   └── toString.java
+│   ├── Operations
+│   │   ├── Les_4_operations
+│   │   │   ├── Addition.java
+│   │   │   ├── Division.java
+│   │   │   ├── Multiplication.java
+│   │   │   └── Soustraction.java
+│   │   ├── Operations_mathematiques
+│   │   │   ├── Arrondis.java
+│   │   │   ├── Calculs_prem-est_premier.java
+│   │   │   ├── Chiffres_significatifs.java
+│   │   │   ├── Compare_nombres.java
+│   │   │   ├── Copie_et_equals.java
+│   │   │   ├── Decompose_fact_premiers.java
+│   │   │   ├── Egalise_nombres.java
+│   │   │   ├── Partie_decimale.java
+│   │   │   ├── Somme-produit_des_chiffres.java
+│   │   │   └── Valeur_absolue.java
+│   │   ├── Operations_utilitaires
+│   │   │   └── Gestion_des_0.java
+│   │   └── Reconnaissance_expression
+│   │       ├── Reconnaissance_doubles_sans_parentheses.java
+│   │       └── Reconnaissance_entiers_sans_parentheses(1).java
+│   └── Utilitaire
+│       └── preprocesseur_imports.py
+└── tests
+    └── tests.js
+
+12 directories, 33 files
+
+Important ce qui se trouve dans le dossier Archives ne doit pas étre modifié, ni le dossier lui-même.
+
 Taches à faire : 
 
 

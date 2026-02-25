@@ -1,257 +1,363 @@
 
-	Character [] operateurs_tmp = 
-		{'+', '-', '*', '/'};
-	Stack<String> st = new Stack<String>();
-	ArrayList<Character> operateurs = new ArrayList<Character>();
+// ==============================================================================
+// Donnees
+// ==============================================================================
 
-	public void operateurs () {
-		for (Character c1 : operateurs_tmp) {
-			operateurs.add(c1);
-		}
-	}
+	Character[] listeOperateurs = {'+', '-', '*', '/'};
+	Stack<String> pileCalcul = new Stack<String>();
+	ArrayList<Character> operateursAutorises = new ArrayList<Character>();
+
+// ==============================================================================
+// Fonctions utilitaires
+// ==============================================================================
 
 	/**
-		Renvoie -1 en cas d'erreur.
-	**/
-	public int analyse_expression_sans_parentheses (String expr) {
-		if (expr==null) {
-			aff("L'expression est null");
-			return -1;
+	 * Initialise la liste des operateurs autorises.
+	 * Copie les operateurs du tableau vers l'ArrayList.
+	 */
+	public void operateurs() {
+		for (Character caractere : listeOperateurs) {
+			operateursAutorises.add(caractere);
 		}
-		if (expr.isEmpty()) {
-			aff("L'expression est vide.");
-			return -1;
-		}
-		int lenexpr = expr.length();
-		int cmp = 0;
-		String tmp = "";
-
-		for (int i=0; i<lenexpr; i++) {
-			if (isCharNumber(expr.charAt(i))) {
-				//affnn(expr.charAt(i));
-				tmp = mange_nombre(expr, i);
-				st.push(tmp);
-				while (i<lenexpr 
-				&& isCharNumber(expr.charAt(i))) i++;
-			}
-			if (cmp>0) calcul_pile(st);
-			if (i>=lenexpr) break;
-			if (operateurs.contains(expr.charAt(i))) {
-				tmp = ""+mange_operateur(expr, i);
-				st.push(tmp);
-			}
-			cmp++;
-		}
-		String res = pop_erreur(st);
-		return convertStrInt(res);
 	}
 
-// ##################### Fonctions de traitement des symboles ######################### //
+// ------------------------------------------------------------------------------
+// Gestion de la pile
+// ------------------------------------------------------------------------------
 
-	public String pop_erreur (Stack<String> st) {
-		if (!st.empty()) {
-			return st.pop();
-		}
-		else {
+	/**
+	 * Depile un element avec gestion d'erreur.
+	 * @param pile Pile a depiler.
+	 * @return Element depile ou chaine vide si pile vide.
+	 */
+	public String popAvecErreur(Stack<String> pile) {
+		if (!pile.empty()) {
+			return pile.pop();
+		} else {
 			aff("Erreur : la pile est vide prematurement.");
 			return "";
 		}
 	}
 
-	public void calcul_pile (Stack<String> st) {
-		String aS = pop_erreur(st);
-		String symS = pop_erreur(st);
-		String bS = pop_erreur(st);
+	/**
+	 * Effectue un calcul avec les 3 elements en haut de pile.
+	 * Depile operande, operateur, operande puis empile le resultat.
+	 * @param pile Pile de calcul.
+	 */
+	public void calculPile(Stack<String> pile) {
+		String operandeA = popAvecErreur(pile);
+		String symbole = popAvecErreur(pile);
+		String operandeB = popAvecErreur(pile);
+		int resultatTemporaire = traiteSymbolesInt(operandeB, operandeA, symbole);
+		aff("resultatTemporaire = " + resultatTemporaire);
+		pile.push("" + resultatTemporaire);
+	}
 
-		int res_tmp = traite_symbolesInt(bS, aS, symS);
-		aff("res_tmp = "+res_tmp);
-		st.push(""+res_tmp);
+// ------------------------------------------------------------------------------
+// Verification des nombres doubles
+// ------------------------------------------------------------------------------
+
+	/**
+	 * Verifie et nettoie un nombre double avec separateurs.
+	 * @param nombre Nombre a verifier.
+	 * @param separateur Separateur decimal utilise.
+	 * @return Nombre nettoye ou chaine vide si invalide.
+	 */
+	public String verifieDoubleCorrecte(String nombre, char separateur) {
+		if (nombre == null || nombre.isEmpty()) {
+			aff("Le nombre est null ou vide.");
+			return "";
+		}
+		char separateurAlternatif = (separateur == '.') ? ',' : '.';
+		String[] partiesNombre = nombre.split("" + separateur);
+		if (partiesNombre == null) {
+			return "";
+		}
+		if (partiesNombre.length == 1) {
+			return verifierPartieUnique(partiesNombre[0], separateur);
+		}
+		if (partiesNombre.length < 2) {
+			return "";
+		}
+		return verifierPartieDecimale(partiesNombre, separateurAlternatif);
 	}
 
 	/**
-		Retourne -1 en cas d'erreur.
-	**/
-	public int traite_symbolesInt (String aS, String bS, String symS) {
-		if (symS==null || symS.isEmpty()) {
-			aff("Symbole null ou egal a "+'"'+'"'+".");
-			return -1;
+	 * Verifie une partie unique du nombre.
+	 * @param partie Partie a verifier.
+	 * @param separateur Separateur a retirer.
+	 * @return Partie nettoyee ou chaine vide si invalide.
+	 */
+	private String verifierPartieUnique(String partie, char separateur) {
+		if (partie == null || partie.isEmpty() || partie.equals(",")) {
+			return "";
 		}
-		if (!isInteger(aS) || !isInteger(bS)) {
-			aff("aS (= "+aS+") ou bS (= "+bS+") ne sont pas des nombres.");
-			return -1;
-		}
-		int a = Integer.parseInt(aS);
-		int b = Integer.parseInt(bS);
-		char sym = symS.charAt(0);
-		if (!operateurs.contains(sym)) {
-			aff("sym (= "+sym+") n'est pas un operateur.");
-			return -1;
-		}
-		int res = 0;
-
-		if (sym=='+') {
-			res = a+b;
-		}
-
-		if (sym=='-') {
-			res = a-b;
-		}
-
-		if (sym=='*') {
-			res = a*b;
-		}
-
-		if (sym=='/') {
-			res = a/b;
-		}
-
-		return res;
+		return partie.replace("" + separateur, "");
 	}
 
-// ########################### Fonction mange_symbole ################################# //
+// ------------------------------------------------------------------------------
+// Verification partie decimale
+// ------------------------------------------------------------------------------
 
-	public String verifie_double_correcte (String nombre, char sym) {
-		if (nombre==null) {
-			aff("Le nombre est null.");
-			return "";
-		}
-		if (nombre.isEmpty()) {
-			aff("Le nombre est vide.");
-			return "";
-		}
-		// Gestion des erreurs
-		char sym2 = '.';
-		if (sym=='.') sym2 = ',';
-		String [] double_tmp = nombre.split(""+sym);
-		if (double_tmp==null) return "";
-		if (double_tmp.length==1) {
-			if (double_tmp[0]==null) return "";
-			if (double_tmp[0].isEmpty()) return "";
-			if (double_tmp[0].equals(",")) return "";
-			return nombre.replace(""+sym, "");
-		}
-		if (double_tmp.length<2) return "";
-		// Gestion des erreurs avec le nombre.split(sym).
-
-		String tmp = double_tmp[1];
-		int lentmp = tmp.length();
-		
-		for (int i=0; i<lentmp; i++) {
-			if (i%3==0) {
-				if (tmp.charAt(i)!=sym2) return "";
-			}
-			else {
-				if (!isCharNumber(tmp.charAt(i)))
+	/**
+	 * Verifie la partie decimale avec separateurs de milliers.
+	 * @param partiesNombre Tableau des parties du nombre.
+	 * @param separateurMilliers Separateur de milliers attendu.
+	 * @return Nombre nettoye ou chaine vide si invalide.
+	 */
+	private String verifierPartieDecimale(String[] partiesNombre, char separateurMilliers) {
+		String partieDecimale = partiesNombre[1];
+		int longueurDecimale = partieDecimale.length();
+		for (int index = 0; index < longueurDecimale; index++) {
+			if (index % 3 == 0) {
+				if (partieDecimale.charAt(index) != separateurMilliers) {
 					return "";
+				}
+			} else {
+				if (!isCharNumber(partieDecimale.charAt(index))) {
+					return "";
+				}
 			}
 		}
-		return double_tmp[0]+tmp.replace(""+sym2, "");
+		return partiesNombre[0] + partieDecimale.replace("" + separateurMilliers, "");
 	}
 
+// ------------------------------------------------------------------------------
+// Analyse des nombres
+// ------------------------------------------------------------------------------
+
 	/**
-		Retourne -1 en cas d'erreur.
-	**/
-	public double analyse_nombreDouble (String nombre) {
-		int i = 0;
-		int nbr_virgules = 0, nbr_points = 0;
-		boolean virgule = false;
-		boolean point = false;
-
-		nbr_virgules = compteOcurrences(nombre, ',');
-		nbr_points = compteOcurrences(nombre, '.');
-
-		aff("nbr_virgules = "+nbr_virgules);
-		aff("nbr_points = "+nbr_points);
-
-		if (nbr_virgules==0 && nbr_points==0) {
+	 * Analyse et convertit un nombre double depuis une chaine.
+	 * Gere les formats avec virgule ou point decimal.
+	 * @param nombre Chaine representant le nombre.
+	 * @return Valeur double ou -1 en cas d'erreur.
+	 */
+	public double analyseNombreDouble(String nombre) {
+		int nombreVirgules = compteOcurrences(nombre, ',');
+		int nombrePoints = compteOcurrences(nombre, '.');
+		aff("nombreVirgules = " + nombreVirgules);
+		aff("nombrePoints = " + nombrePoints);
+		if (nombreVirgules == 0 && nombrePoints == 0) {
 			if (isInteger(nombre)) {
 				return Integer.parseInt(nombre);
 			}
+		} else {
+			nombre = normaliserSeparateurs(nombre, nombreVirgules, nombrePoints);
+			nombreVirgules = compteOcurrences(nombre, ',');
+			nombrePoints = compteOcurrences(nombre, '.');
+			aff("nombreVirgules = " + nombreVirgules);
+			aff("nombrePoints = " + nombrePoints);
+			aff("nombre = " + nombre);
+			return convertirEnDouble(nombre, nombreVirgules, nombrePoints);
 		}
-		else {
-			if (nbr_virgules==1 && nbr_points>1) {
-				nombre = verifie_double_correcte (nombre, ',');
-			}
-
-			if (nbr_virgules>1 && nbr_points==1) {
-				nombre = verifie_double_correcte (nombre, '.');
-			}
-
-			nbr_virgules = compteOcurrences(nombre, ',');
-			nbr_points = compteOcurrences(nombre, '.');
-
-			aff("nbr_virgules = "+nbr_virgules);
-			aff("nbr_points = "+nbr_points);
-			aff("nombre = "+nombre);
-
-			if (nbr_virgules>1 && nbr_points>1)
-				return -1;
-			if (nbr_virgules==1 && nbr_points==0) {
-				return Double.parseDouble(
-				nombre.replace(',', '.'));
-			}
-			if (nbr_virgules==0 && nbr_points==1) {
-				return Double.parseDouble(nombre);	
-			}
-		}
-		return -1;		
+		return -1;
 	}
 
-	public String mange_nombre (String expr, int indice_debut) {
-		int lenexpr = expr.length();
-		boolean virgules = false;
-		boolean points = false;
-		boolean isDigit = true;
-		String res = "";
-
-		for (int i=indice_debut; i<lenexpr && isDigit; i++) {
-			if (isCharNumber(expr.charAt(i))) {
-				res+=expr.charAt(i);
-			}
-			if (expr.charAt(i)==',') {
-				virgules = true;
-				res+=expr.charAt(i);
-			}
-			if (expr.charAt(i)=='.') {
-				points = true;
-				res+=expr.charAt(i);
-			}
-			else isDigit = false;
+	/**
+	 * Normalise les separateurs du nombre.
+	 * @param nombre Nombre a normaliser.
+	 * @param nombreVirgules Compte des virgules.
+	 * @param nombrePoints Compte des points.
+	 * @return Nombre normalise.
+	 */
+	private String normaliserSeparateurs(String nombre, int nombreVirgules, int nombrePoints) {
+		if (nombreVirgules == 1 && nombrePoints > 1) {
+			return verifieDoubleCorrecte(nombre, ',');
 		}
-		aff(res);
-		if (virgules || points) {
-			res = ""+analyse_nombreDouble(res);
-			return res;
+		if (nombreVirgules > 1 && nombrePoints == 1) {
+			return verifieDoubleCorrecte(nombre, '.');
 		}
-		else return res;
+		return nombre;
 	}
 
-	public char mange_operateur (String expr, int indice) {
-		int lenexpr = expr.length();
+// ------------------------------------------------------------------------------
+// Conversion en double
+// ------------------------------------------------------------------------------
 
-		if (indice>=0 && indice<lenexpr) {
-			aff(expr.charAt(indice));
-			return expr.charAt(indice);
+	/**
+	 * Convertit la chaine normalisee en double.
+	 * @param nombre Nombre normalise.
+	 * @param nombreVirgules Compte des virgules.
+	 * @param nombrePoints Compte des points.
+	 * @return Valeur double ou -1 si invalide.
+	 */
+	private double convertirEnDouble(String nombre, int nombreVirgules, int nombrePoints) {
+		if (nombreVirgules > 1 && nombrePoints > 1) {
+			return -1;
 		}
-		else return (char)(-1);
+		if (nombreVirgules == 1 && nombrePoints == 0) {
+			return Double.parseDouble(nombre.replace(',', '.'));
+		}
+		if (nombreVirgules == 0 && nombrePoints == 1) {
+			return Double.parseDouble(nombre);
+		}
+		return -1;
 	}
-	
-// ##################### Main ####################### //
 
-	public static void main (String [] args) {
-		CalculsDouble cb = new CalculsDouble();
-		/**String expr1
-		//"103*8/09+3-8"
-		 = "";
-		int res_verififcation = 0;
-		aff("expr1 = "+expr1);
-		cb.operateurs();
-		int res = cb.analyse_expression_sans_parentheses(expr1);
-		aff("res = "+res);
-		aff("Verification : "+res_verififcation);
-		**/
+// ==============================================================================
+// Fonctions principales
+// ==============================================================================
+
+// ------------------------------------------------------------------------------
+// Extraction des symboles
+// ------------------------------------------------------------------------------
+
+	/**
+	 * Extrait un nombre depuis une expression a partir d'un indice.
+	 * Gere les virgules et points decimaux.
+	 * @param expression Expression source.
+	 * @param indiceDebut Indice de debut d'extraction.
+	 * @return Nombre extrait sous forme de chaine.
+	 */
+	public String mangeNombre(String expression, int indiceDebut) {
+		int longueurExpression = expression.length();
+		boolean contientVirgules = false;
+		boolean contientPoints = false;
+		boolean estChiffre = true;
+		String resultat = "";
+		for (int index = indiceDebut; index < longueurExpression && estChiffre; index++) {
+			char caractereActuel = expression.charAt(index);
+			if (isCharNumber(caractereActuel)) {
+				resultat += caractereActuel;
+			} else if (caractereActuel == ',') {
+				contientVirgules = true;
+				resultat += caractereActuel;
+			} else if (caractereActuel == '.') {
+				contientPoints = true;
+				resultat += caractereActuel;
+			} else {
+				estChiffre = false;
+			}
+		}
+		aff(resultat);
+		if (contientVirgules || contientPoints) {
+			return "" + analyseNombreDouble(resultat);
+		}
+		return resultat;
+	}
+
+	/**
+	 * Extrait un operateur depuis une expression.
+	 * @param expression Expression source.
+	 * @param indice Position de l'operateur.
+	 * @return Caractere operateur ou -1 si hors limites.
+	 */
+	public char mangeOperateur(String expression, int indice) {
+		int longueurExpression = expression.length();
+		if (indice >= 0 && indice < longueurExpression) {
+			aff(expression.charAt(indice));
+			return expression.charAt(indice);
+		}
+		return (char) (-1);
+	}
+
+// ------------------------------------------------------------------------------
+// Traitement des symboles
+// ------------------------------------------------------------------------------
+
+	/**
+	 * Effectue une operation arithmetique entre deux operandes.
+	 * @param chaineA Premier operande (chaine).
+	 * @param chaineB Second operande (chaine).
+	 * @param chaineSymbole Operateur (chaine).
+	 * @return Resultat de l'operation ou -1 en cas d'erreur.
+	 */
+	public int traiteSymbolesInt(String chaineA, String chaineB, String chaineSymbole) {
+		if (chaineSymbole == null || chaineSymbole.isEmpty()) {
+			aff("Symbole null ou egal a " + '"' + '"' + ".");
+			return -1;
+		}
+		if (!isInteger(chaineA) || !isInteger(chaineB)) {
+			aff("chaineA (= " + chaineA + ") ou chaineB (= " + chaineB + ") ne sont pas des nombres.");
+			return -1;
+		}
+		int operandeA = Integer.parseInt(chaineA);
+		int operandeB = Integer.parseInt(chaineB);
+		char symbole = chaineSymbole.charAt(0);
+		if (!operateursAutorises.contains(symbole)) {
+			aff("symbole (= " + symbole + ") n'est pas un operateur.");
+			return -1;
+		}
+		return executerOperation(operandeA, operandeB, symbole);
+	}
+
+	/**
+	 * Execute l'operation arithmetique.
+	 * @param operandeA Premier operande.
+	 * @param operandeB Second operande.
+	 * @param symbole Operateur.
+	 * @return Resultat de l'operation.
+	 */
+	private int executerOperation(int operandeA, int operandeB, char symbole) {
+		if (symbole == '+') {
+			return operandeA + operandeB;
+		}
+		if (symbole == '-') {
+			return operandeA - operandeB;
+		}
+		if (symbole == '*') {
+			return operandeA * operandeB;
+		}
+		if (symbole == '/') {
+			return operandeA / operandeB;
+		}
+		return 0;
+	}
+
+// ------------------------------------------------------------------------------
+// Analyse d'expression
+// ------------------------------------------------------------------------------
+
+	/**
+	 * Analyse et evalue une expression mathematique sans parentheses.
+	 * Utilise une pile pour gerer les operations.
+	 * @param expression Expression a analyser.
+	 * @return Resultat de l'expression ou -1 en cas d'erreur.
+	 */
+	public int analyseExpressionSansParentheses(String expression) {
+		if (expression == null) {
+			aff("L'expression est null");
+			return -1;
+		}
+		if (expression.isEmpty()) {
+			aff("L'expression est vide.");
+			return -1;
+		}
+		int longueurExpression = expression.length();
+		int compteur = 0;
+		String elementTemporaire = "";
+		for (int index = 0; index < longueurExpression; index++) {
+			if (isCharNumber(expression.charAt(index))) {
+				elementTemporaire = mangeNombre(expression, index);
+				pileCalcul.push(elementTemporaire);
+				while (index < longueurExpression && isCharNumber(expression.charAt(index))) {
+					index++;
+				}
+			}
+			if (compteur > 0) {
+				calculPile(pileCalcul);
+			}
+			if (index >= longueurExpression) {
+				break;
+			}
+			if (operateursAutorises.contains(expression.charAt(index))) {
+				elementTemporaire = "" + mangeOperateur(expression, index);
+				pileCalcul.push(elementTemporaire);
+			}
+			compteur++;
+		}
+		String resultat = popAvecErreur(pileCalcul);
+		return convertStrInt(resultat);
+	}
+
+// ==============================================================================
+// Main
+// ==============================================================================
+
+	public static void main(String[] args) {
+		CalculsDouble calculateur = new CalculsDouble();
 		String nombre = "12.100,0";
-		aff("nombre = "+nombre);
-		Double tmpD = cb.analyse_nombreDouble(nombre);
-		aff("res = "+tmpD);
+		aff("nombre = " + nombre);
+		Double resultatDouble = calculateur.analyseNombreDouble(nombre);
+		aff("resultat = " + resultatDouble);
 	}

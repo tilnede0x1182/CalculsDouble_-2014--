@@ -1,48 +1,63 @@
-	public CalculsDouble () {
-		ent="0";
-		dec="";
+	/**
+	 * Constructeur par defaut.
+	 * Initialise un CalculsDouble a zero.
+	 */
+	public CalculsDouble() {
+		partieEntiere = "0";
+		partieDecimale = "";
 	}
 
-	public CalculsDouble (int n0) {
-		ent = ""+(int)(n0);
+	/**
+	 * Constructeur a partir d'un entier.
+	 * @param nombre Valeur entiere a stocker.
+	 */
+	public CalculsDouble(int nombre) {
+		partieEntiere = "" + (int)(nombre);
 		dec = "";
-
-		if (ent.contains("-")) {
-			estNegatif = true;
-			ent = ent.replace("-", "");
-		}
+		extraireSigneNegatif();
 	}
 
-	public CalculsDouble (double n0) {
-		ent = ""+(int)(n0);
-		dec = partieDecimale(n0);
-
-		if (ent.contains("-")) {
-			estNegatif = true;
-			ent = ent.replace("-", "");
-		}
+	/**
+	 * Constructeur a partir d'un double.
+	 * @param nombre Valeur decimale a stocker.
+	 */
+	public CalculsDouble(double nombre) {
+		ent = "" + (int)(nombre);
+		partieDecimale = extrairePartieDecimale(nombre);
+		extraireSigneNegatif();
 	}
 
-	public CalculsDouble (int n0, boolean repr_anglaise) {
-		representation_anglaise = repr_anglaise;
-
-		ent = ""+(int)(n0);
-		dec = "0";
-
-		if (ent.contains("-")) {
-			estNegatif = true;
-			ent = ent.replace("-", "");
-		}
+	/**
+	 * Constructeur a partir d'un entier avec representation.
+	 * @param nombre Valeur entiere a stocker.
+	 * @param representationAnglaise True pour notation avec point.
+	 */
+	public CalculsDouble(int nombre, boolean representationAnglaise) {
+		representation_anglaise = representationAnglaise;
+		ent = "" + (int)(nombre);
+		partieDecimale = "0";
+		extraireSigneNegatif();
 	}
 
-	public CalculsDouble (double n0, boolean repr_anglaise) {
-		representation_anglaise = repr_anglaise;
+	/**
+	 * Constructeur a partir d'un double avec representation.
+	 * @param nombre Valeur decimale a stocker.
+	 * @param representationAnglaise True pour notation avec point.
+	 */
+	public CalculsDouble(double nombre, boolean representationAnglaise) {
+		representation_anglaise = representationAnglaise;
+		ent = "" + (int)(nombre);
+		dec = partieDecimale(nombre);
+		extraireSigneNegatif();
+	}
 
-		ent = ""+(int)(n0);
-		dec = partieDecimale(n0);
-
-		if (ent.contains("-")) {
+	/**
+	 * Extrait le signe negatif de la partie entiere.
+	 * Met a jour estNegatif et nettoie ent.
+	 */
+	private void extraireSigneNegatif() {
+		if (partieEntiere.contains("-")) {
 			estNegatif = true;
-			ent = ent.replace("-", "");
+			partieEntiere = partieEntiere.replace("-", "");
 		}
 	}

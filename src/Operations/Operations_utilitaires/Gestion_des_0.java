@@ -1,47 +1,36 @@
 	/**
-		Enlève les zéros en début de string dans la partie entiere (String ent).
-	**/
-	public String epureZerosEnt (String ent) {
-		boolean plus_de_zeros = false;
-		int  res = 0, lenent = ent.length();
-
-		/**
-		**	Parcours le str pour savoir s'il n'ya a plus de zeros (boolean) 
-		**	et dès qu'on a fini, enlève les zeros en trop.
-		**/
-		res = lenent;
-		int i=0;
-		while (i<lenent && ent.charAt(i)=='0') i++;
-		res = i;
-
-		if (i==lenent) return "0";
-
-		return (ent.substring(res, lenent));
+	 * Enleve les zeros en debut de la partie entiere.
+	 * Exemple : "007" devient "7", "000" devient "0".
+	 * @param partieEntiere Chaine representant la partie entiere.
+	 * @return Chaine nettoyee des zeros superflus.
+	 */
+	public String epureZerosEnt(String partieEntiere) {
+		int longueur = partieEntiere.length();
+		int index = 0;
+		while (index < longueur && partieEntiere.charAt(index) == '0') {
+			index++;
+		}
+		if (index == longueur) {
+			return "0";
+		}
+		return partieEntiere.substring(index, longueur);
 	}
 
 	/**
-		-1 : pas de chiffres significatifs (on fait comme en maths : 
-		le moins de chiffres possible). n : n chiffres aux minimum.
-	**/
-	public String envleveZerosInutils (String dec) {
-		boolean plus_de_zeros = false;
-		int  res = 0, lendec = dec.length();
-
-		/**
-		**	Parcours le str pour savoir s'il n'ya a plus de zeros (boolean) 
-		**	et dès qu'on a fini, enlève les zeros en trop.
-		**/
-		res = lendec;
-		for (int i=0; i<lendec; i++) {
-			if (dec.charAt(i)=='0') {
-				plus_de_zeros = true;
-				res = i;
-			}
-			else {
-				plus_de_zeros = false;
-				res = lendec;
+	 * Enleve les zeros inutiles en fin de partie decimale.
+	 * Exemple : "1200" devient "12", "100" devient "1".
+	 * @param partieDecimale Chaine representant la partie decimale.
+	 * @return Chaine nettoyee des zeros superflus.
+	 */
+	public String envleveZerosInutils(String partieDecimale) {
+		int longueur = partieDecimale.length();
+		int positionFinale = longueur;
+		for (int index = 0; index < longueur; index++) {
+			if (partieDecimale.charAt(index) == '0') {
+				positionFinale = index;
+			} else {
+				positionFinale = longueur;
 			}
 		}
-
-		return (dec.substring(0, res));
+		return partieDecimale.substring(0, positionFinale);
 	}

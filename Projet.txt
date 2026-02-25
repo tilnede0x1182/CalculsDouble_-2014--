@@ -1,0 +1,120 @@
+CalculsDouble - Projet de 2014
+
+Objectif : Bibliothèque Java pour effectuer des calculs arithmétiques sur des nombres décimaux de précision arbitraire, en évitant les limitations des types primitifs (int, double).
+
+================================================================================
+Architecture
+================================================================================
+
+Principe de fonctionnement :
+- Les nombres sont stockés sous forme de chaînes de caractères
+- Partie entière (String ent) et partie décimale (String dec) séparées
+- Permet de manipuler des nombres de longueur arbitraire
+- Gestion du signe via boolean estNegatif
+- Support des représentations française (virgule) et anglaise (point)
+
+Système de compilation :
+- CalculsDouble.java : fichier "maître" avec directives "import" personnalisées
+- preprocesseur_imports.py : script Python qui remplace les "import fichier.java" par le contenu du fichier
+- CalculsDouble_modifie.java : fichier consolidé généré, utilisé pour la compilation
+
+================================================================================
+Structure des fichiers
+================================================================================
+
+Racine :
+- CalculsDouble.java (non utilisé directement, fichier source avec imports)
+- CalculsDouble_modifie.java (fichier consolidé, à compiler)
+- compile.bat (lance preprocesseur_imports.py pour générer le fichier consolidé)
+- generate_javadoc.bat (génère la documentation)
+- Makefile (cibles run, compile, compile_run - à compléter)
+- A_faire.md (bugs connus et améliorations)
+
+src/Fonctions_utilitaires/ :
+- Constructeurs.java : 5 constructeurs (vide, int, double, avec représentation)
+- Fonctions_utilitaires.java : isInteger, convertStrInt, isCharNumber, estNul, compteOcurrences
+- Fonctions_daffichage.java : aff, affnn, affTab, afftab2dim, agrandieTab
+- toString.java : conversion en chaîne avec gestion du signe et de la virgule
+
+src/Operations/Les_4_operations/ :
+- Addition.java : additionneNombres avec gestion des signes et retenues
+- Soustraction.java : soustraitNombres via addition de l'opposé
+- Multiplication.java : mult chiffre par chiffre avec matrice intermédiaire
+- Division.java : division_boucle par soustractions successives (précision paramétrable)
+
+src/Operations/Operations_mathematiques/ :
+- Arrondis.java : arrondi, arrondiEntier, arrondiString
+- Chiffres_significatifs.java : gestion des zéros inutiles
+- Compare_nombres.java : compareNombres, compareNombres_abs (0=égal, 1=a>b, 2=b>a)
+- Copie_et_equals.java : copie profonde et égalité
+- Decompose_fact_premiers.java : décomposition en facteurs premiers
+- Egalise_nombres.java : aligne les parties décimales
+- Partie_decimale.java : extraction de la partie décimale
+- Somme-produit_des_chiffres.java : somme et produit des chiffres
+- Valeur_absolue.java : abs
+- Calculs_prem-est_premier.java : test de primalité, calcul des n premiers
+
+src/Operations/Operations_utilitaires/ :
+- Gestion_des_0.java : epureZerosEnt, envleveZerosInutils
+
+src/Operations/Reconnaissance_expression/ :
+- Reconnaissance_doubles_sans_parentheses.java : parseur d'expressions (pile)
+- Reconnaissance_entiers_sans_parentheses(1).java : (non lu, probablement similaire)
+
+src/Utilitaire/ :
+- preprocesseur_imports.py : script de preprocessing des imports personnalisés
+
+tests/ :
+- tests.js : tests unitaires en JavaScript (simulation de la classe)
+
+Archives/ :
+- CalculsDouble_modifie.java.backup : sauvegarde
+- preprocesseur_imports.py : copie du script
+- READ-ME.txt : instructions de compilation
+
+================================================================================
+Bugs connus (A_faire.md)
+================================================================================
+
+1. additionneNombres : perd la partie décimale si un seul opérande en a une (12,5 + 3 = 15 au lieu de 15,5)
+2. arrondi : force estNegatif=true quand dec est vide (bug)
+3. Integer.parseInt : plante pour nombres > 10 chiffres (devrait utiliser BigInteger)
+
+================================================================================
+Points d'amélioration identifiés
+================================================================================
+
+DRY :
+- Classe monolithique mêlant logique, affichage et I/O
+- compareNombres et compareNombres_abs dupliquent du code
+- Fonctions de manipulation de chaînes réécrivent StringBuilder/String
+
+Sécurité :
+- Champs ent/dec publics, pas d'encapsulation
+- Exceptions non gérées proprement
+
+================================================================================
+Commandes
+================================================================================
+
+Compilation :
+1. compile.bat (ou : python3 preprocesseur_imports.py CalculsDouble.java)
+2. javac CalculsDouble_modifie.java
+
+Exécution :
+java CalculsDouble
+
+Documentation :
+generate_javadoc.bat (ou : javadoc -d javadoc CalculsDouble_modifie.java -private)
+
+Tests :
+node tests/tests.js
+
+================================================================================
+Technologies
+================================================================================
+
+- Java (code principal)
+- Python 3 (script de preprocessing)
+- JavaScript/Node.js (tests)
+- Makefile (automatisation)

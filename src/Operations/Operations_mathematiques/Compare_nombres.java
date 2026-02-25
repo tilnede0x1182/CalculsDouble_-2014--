@@ -1,67 +1,129 @@
 	/**
-		0 : identiques
-		1 : a>b
-		2 : b>a
-
-		-1 : erreur
-	**/
-	public int compareNombres (CalculsDouble a, CalculsDouble b) {
-		int tmp = -1;
-		if (a.estNegatif && !b.estNegatif) return 2;
-		if (!a.estNegatif && b.estNegatif) return 1;
-
-		if (a.estNegatif && b.estNegatif) {
-			tmp = compareNombres_abs(a, b);
-
-			if (tmp==0) return 0;
-			if (tmp==1) return 2;
-			if (tmp==2) return 1;
+	 * Compare deux CalculsDouble en tenant compte du signe.
+	 * @param nombreA Premier nombre.
+	 * @param nombreB Second nombre.
+	 * @return 0 si egaux, 1 si A > B, 2 si B > A, -1 si erreur.
+	 */
+	public int compareNombres(CalculsDouble nombreA, CalculsDouble nombreB) {
+		if (nombreA.estNegatif && !nombreB.estNegatif) {
+			return 2;
 		}
-
-		if (!a.estNegatif && !b.estNegatif)
-			return compareNombres_abs (a, b);
-
+		if (!nombreA.estNegatif && nombreB.estNegatif) {
+			return 1;
+		}
+		if (nombreA.estNegatif && nombreB.estNegatif) {
+			return inverserResultatComparaison(compareNombres_abs(nombreA, nombreB));
+		}
+		if (!nombreA.estNegatif && !nombreB.estNegatif) {
+			return compareNombres_abs(nombreA, nombreB);
+		}
 		return -1;
 	}
 
 	/**
-		Compare nombre avec valeur la absolue de a et de b : 
+	 * Inverse le resultat de comparaison pour nombres negatifs.
+	 * @param resultat Resultat original.
+	 * @return Resultat inverse (1 devient 2, 2 devient 1).
+	 */
+	private int inverserResultatComparaison(int resultat) {
+		if (resultat == 0) {
+			return 0;
+		}
+		if (resultat == 1) {
+			return 2;
+		}
+		if (resultat == 2) {
+			return 1;
+		}
+		return -1;
+	}
 
-		0 : identiques
-		1 : a>b
-		2 : b>a
-	**/
-	public int compareNombres_abs (CalculsDouble a, CalculsDouble b) {
-		int res=0;
+// ------------------------------------------------------------------------------
+// Comparaison en valeur absolue
+// ------------------------------------------------------------------------------
 
-		if (a.ent.length()>b.ent.length()) return 1;
-		if (a.ent.length()<b.ent.length()) return 2;
+	/**
+	 * Compare deux CalculsDouble en valeur absolue.
+	 * @param nombreA Premier nombre.
+	 * @param nombreB Second nombre.
+	 * @return 0 si egaux, 1 si |A| > |B|, 2 si |B| > |A|.
+	 */
+	public int compareNombres_abs(CalculsDouble nombreA, CalculsDouble nombreB) {
+		int comparaisonEntiere = comparerPartiesEntieres(nombreA, nombreB);
+		if (comparaisonEntiere != 0) {
+			return comparaisonEntiere;
+		}
+		return comparerPartiesDecimales(nombreA, nombreB);
+	}
 
-		// donc a.ent.length() == b.ent.length()
-		int alen = a.ent.length();
-
-		for (int i=0;  i<alen;  i++) {
-			if (Integer.parseInt(""+a.ent.charAt(i))>Integer.parseInt(""+b.ent.charAt(i)))
+	/**
+	 * Compare les parties entieres de deux nombres.
+	 * @param nombreA Premier nombre.
+	 * @param nombreB Second nombre.
+	 * @return 0 si egales, 1 si A > B, 2 si B > A.
+	 */
+	private int comparerPartiesEntieres(CalculsDouble nombreA, CalculsDouble nombreB) {
+		if (nombreA.partieEntiere.length() > nombreB.partieEntiere.length()) {
+			return 1;
+		}
+		if (nombreA.partieEntiere.length() < nombreB.partieEntiere.length()) {
+			return 2;
+		}
+		int longueur = nombreA.partieEntiere.length();
+		for (int index = 0; index < longueur; index++) {
+			int chiffreA = Integer.parseInt("" + nombreA.partieEntiere.charAt(index));
+			int chiffreB = Integer.parseInt("" + nombreB.partieEntiere.charAt(index));
+			if (chiffreA > chiffreB) {
 				return 1;
-			if (Integer.parseInt(""+a.ent.charAt(i))<Integer.parseInt(""+b.ent.charAt(i)))
+			}
+			if (chiffreA < chiffreB) {
 				return 2;
+			}
 		}
+		return 0;
+	}
 
-		// donc les parties entières sont identiques
-		int xlen = Math.min(a.dec.length(), b.dec.length());
-		for (int i=0;  i<xlen;  i++) {
-			if (Integer.parseInt(""+a.dec.charAt(i))>Integer.parseInt(""+b.dec.charAt(i)))
+	/**
+	 * Compare les parties decimales de deux nombres.
+	 * @param nombreA Premier nombre.
+	 * @param nombreB Second nombre.
+	 * @return 0 si egales, 1 si A > B, 2 si B > A.
+	 */
+	private int comparerPartiesDecimales(CalculsDouble nombreA, CalculsDouble nombreB) {
+		int longueurMin = Math.min(nombreA.partieDecimale.length(), nombreB.partieDecimale.length());
+		for (int index = 0; index < longueurMin; index++) {
+			int chiffreA = Integer.parseInt("" + nombreA.partieDecimale.charAt(index));
+			int chiffreB = Integer.parseInt("" + nombreB.partieDecimale.charAt(index));
+			if (chiffreA > chiffreB) {
 				return 1;
-			if (Integer.parseInt(""+a.dec.charAt(i))<Integer.parseInt(""+b.dec.charAt(i)))
+			}
+			if (chiffreB > chiffreA) {
 				return 2;
+			}
 		}
+		return comparerDecimalesRestantes(nombreA, nombreB, longueurMin);
+	}
 
-		if (a.dec.length()!=b.dec.length() && Math.max(a.dec.length(), b.dec.length())>xlen) {
-			if (a.dec.length()>xlen)
-				if (Integer.parseInt(""+a.dec.charAt(xlen))>0) return 1;
-			if (b.dec.length()>xlen)
-				if (Integer.parseInt(""+b.dec.charAt(xlen))>0) return 2;
+	/**
+	 * Compare les decimales restantes apres la longueur commune.
+	 * @param nombreA Premier nombre.
+	 * @param nombreB Second nombre.
+	 * @param longueurMin Longueur commune deja comparee.
+	 * @return 0 si egales, 1 si A > B, 2 si B > A.
+	 */
+	private int comparerDecimalesRestantes(CalculsDouble nombreA, CalculsDouble nombreB, int longueurMin) {
+		int longueurMax = Math.max(nombreA.partieDecimale.length(), nombreB.partieDecimale.length());
+		if (nombreA.partieDecimale.length() != nombreB.partieDecimale.length() && longueurMax > longueurMin) {
+			if (nombreA.partieDecimale.length() > longueurMin) {
+				if (Integer.parseInt("" + nombreA.partieDecimale.charAt(longueurMin)) > 0) {
+					return 1;
+				}
+			}
+			if (nombreB.partieDecimale.length() > longueurMin) {
+				if (Integer.parseInt("" + nombreB.partieDecimale.charAt(longueurMin)) > 0) {
+					return 2;
+				}
+			}
 		}
-
 		return 0;
 	}

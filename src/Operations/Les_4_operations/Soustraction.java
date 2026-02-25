@@ -1,44 +1,94 @@
-	public CalculsDouble soustraitNombres (CalculsDouble a, CalculsDouble b){
-		int recul = 0;
-		int chiffres_avant_la_virgule = Math.min(compteOcurrences(a.dec, 
-			'0'), compteOcurrences(b.dec, '0'));
-		CalculsDouble c = new CalculsDouble ();
-		CalculsDouble [] tmpCD = egaliseNombres(a, b); a = tmpCD[0]; 
-			b = tmpCD[1];
+	/**
+	 * Soustrait deux CalculsDouble (A - B).
+	 * Utilise l'addition avec l'oppose de B.
+	 * @param nombreA Premier nombre.
+	 * @param nombreB Second nombre a soustraire.
+	 * @return Resultat de la soustraction.
+	 */
+	public CalculsDouble soustraitNombres(CalculsDouble nombreA, CalculsDouble nombreB) {
+		int chiffresAvantVirgule = Math.min(
+			compteOcurrences(nombreA.partieDecimale, '0'),
+			compteOcurrences(nombreB.partieDecimale, '0')
+		);
+		CalculsDouble resultat = new CalculsDouble();
+		CalculsDouble[] nombresEgalises = egaliseNombres(nombreA, nombreB);
+		nombreA = nombresEgalises[0];
+		nombreB = nombresEgalises[1];
+		integrerSignesPourSoustraction(nombreA, nombreB);
+		resultat = calculerDifference(nombreA, nombreB, resultat, chiffresAvantVirgule);
+		return resultat;
+	}
 
-		/******************************** Intégration du signe "-" **/
-		if (a.estNegatif || b.estNegatif) {
-			if (a.estNegatif) a.ent = "-"+a.ent;
-			if (b.estNegatif) b.ent = "-"+b.ent;
-		}
-		/************************************************************/
-
-		c.ent = ""+(Integer.parseInt(a.ent)-Integer.parseInt(b.ent));
-		if (!a.dec.isEmpty() && !b.dec.isEmpty()) 
-			c.dec = ""+(Integer.parseInt(a.dec)
-				-Integer.parseInt(b.dec));
-		else {
-			c.dec="";
-			if (c.ent.contains("-") || c.dec.contains("-")) {
-				c.estNegatif=true;
-				c.ent = c.ent.replace("-", "");
-				c.dec = c.dec.replace("-", "");
+	/**
+	 * Integre les signes dans les parties entieres pour la soustraction.
+	 * @param nombreA Premier nombre.
+	 * @param nombreB Second nombre.
+	 */
+	private void integrerSignesPourSoustraction(CalculsDouble nombreA, CalculsDouble nombreB) {
+		if (nombreA.estNegatif || nombreB.estNegatif) {
+			if (nombreA.estNegatif) {
+				nombreA.partieEntiere = "-" + nombreA.ent;
 			}
-			return c;
+			if (nombreB.estNegatif) {
+				nombreB.partieEntiere = "-" + nombreB.ent;
+			}
 		}
+	}
 
-		if (c.dec.contains("-")) {
-			c.estNegatif = true;
-			c.dec = c.dec.replace("-", "");
+	/**
+	 * Calcule la difference des parties entieres et decimales.
+	 * @param nombreA Premier nombre.
+	 * @param nombreB Second nombre.
+	 * @param resultat Resultat en cours.
+	 * @param chiffresAvantVirgule Nombre de zeros avant la virgule.
+	 * @return Resultat de la difference.
+	 */
+	private CalculsDouble calculerDifference(CalculsDouble nombreA, CalculsDouble nombreB, CalculsDouble resultat, int chiffresAvantVirgule) {
+		resultat.partieEntiere = "" + (Integer.parseInt(nombreA.ent) - Integer.parseInt(nombreB.ent));
+		if (!nombreA.partieDecimale.isEmpty() && !nombreB.partieDecimale.isEmpty()) {
+			resultat.partieDecimale = "" + (Integer.parseInt(nombreA.partieDecimale) - Integer.parseInt(nombreB.partieDecimale));
+		} else {
+			resultat.partieDecimale = "";
+			resultat = nettoyerSignesSoustraction(resultat);
+			return resultat;
 		}
+		resultat = nettoyerSignesSoustraction(resultat);
+		resultat = ajouterZerosSoustraction(nombreA, nombreB, resultat, chiffresAvantVirgule);
+		return resultat;
+	}
 
-		c.ent = c.ent.replace("-", ""); // au cas où
-
-		if (a.dec.charAt(0)=='0' || b.dec.charAt(0)=='0') recul = 1;
-
-		for (int i = 0; i<chiffres_avant_la_virgule+recul-2; i++) {
-			c.dec = "0"+c.dec;
+	/**
+	 * Nettoie les signes negatifs parasites apres soustraction.
+	 * @param resultat Resultat a nettoyer.
+	 * @return Resultat nettoye.
+	 */
+	private CalculsDouble nettoyerSignesSoustraction(CalculsDouble resultat) {
+		if (resultat.partieDecimale.contains("-")) {
+			resultat.estNegatif = true;
+			resultat.partieDecimale = resultat.partieDecimale.replace("-", "");
 		}
+		if (resultat.partieEntiere.contains("-")) {
+			resultat.estNegatif = true;
+			resultat.partieEntiere = resultat.partieEntiere.replace("-", "");
+		}
+		return resultat;
+	}
 
-		return c;
+	/**
+	 * Ajoute les zeros necessaires a la partie decimale.
+	 * @param nombreA Premier nombre.
+	 * @param nombreB Second nombre.
+	 * @param resultat Resultat en cours.
+	 * @param chiffresAvantVirgule Nombre de zeros avant la virgule.
+	 * @return Resultat avec zeros ajoutes.
+	 */
+	private CalculsDouble ajouterZerosSoustraction(CalculsDouble nombreA, CalculsDouble nombreB, CalculsDouble resultat, int chiffresAvantVirgule) {
+		int recul = 0;
+		if (nombreA.partieDecimale.charAt(0) == '0' || nombreB.partieDecimale.charAt(0) == '0') {
+			recul = 1;
+		}
+		for (int index = 0; index < chiffresAvantVirgule + recul - 2; index++) {
+			resultat.partieDecimale = "0" + resultat.partieDecimale;
+		}
+		return resultat;
 	}

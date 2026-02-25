@@ -2,25 +2,40 @@ import java.util.Stack;
 import java.util.HashSet;
 import java.util.ArrayList;
 
+/**
+ * Classe principale pour les calculs sur nombres decimaux.
+ * Represente un nombre avec partie entiere et decimale.
+ * Utilise un preprocesseur pour inclure les fichiers sources.
+ */
 class CalculsDouble {
-	boolean estNegatif=false;
-	boolean representation_anglaise=false;
 
-	String ent;
-	String dec;
+// ==============================================================================
+// Donnees
+// ==============================================================================
 
-// ############################### Constructeurs ####################################### //
+	boolean estNegatif = false;
+	boolean representation_anglaise = false;
+	String partieEntiere;
+	String partieDecimale;
+
+// ==============================================================================
+// Constructeurs
+// ==============================================================================
 
 	import Fonctions_utilitaires\Constructeurs.java
 
-// ################################# Opérations ######################################## //
+// ==============================================================================
+// Operations arithmetiques
+// ==============================================================================
 
 	import Operations\Les_4_operations\Addition.java
 	import Operations\Les_4_operations\Multiplication.java
 	import Operations\Les_4_operations\Soustraction.java
 	import Operations\Les_4_operations\Division.java
 
-// ########################## Fonctions mathématiques ################################## //
+// ==============================================================================
+// Operations mathematiques
+// ==============================================================================
 
 	import Operations\Operations_utilitaires\Gestion_des_0.java
 	import Operations\Operations_mathematiques\Chiffres_significatifs.java
@@ -34,16 +49,22 @@ class CalculsDouble {
 	import Operations\Operations_mathematiques\Somme-produit_des_chiffres.java
 	import Operations\Operations_mathematiques\Calculs_prem-est_premier.java
 
-// ######################### Fonctions utilitaires ##################################### //
+// ==============================================================================
+// Fonctions utilitaires
+// ==============================================================================
 
 	import Fonctions_utilitaires\Fonctions_utilitaires.java
 	import Fonctions_utilitaires\Fonctions_daffichage.java
 
-// ################################ toString ########################################### //
+// ==============================================================================
+// Affichage
+// ==============================================================================
 
 	import Fonctions_utilitaires\toString.java
 
-// ######################## Reconnaissance opérations ################################## //
+// ==============================================================================
+// Reconnaissance d'expressions
+// ==============================================================================
 
 	import Operations\Reconnaissance_expression\Reconnaissance_doubles_sans_parentheses.java
 }

@@ -1,64 +1,124 @@
 
-	public int [] decompose_en_facteurs_premiers (CalculsDouble n0) {
-		if (!n0.dec.isEmpty()) aff("n0.dec!="+'"'+'"'+" : on "
-					+"prend la troncature entière du nombre.");
-		if (n0.ent.isEmpty()) return null; 
-		// si n0.ent="", il n'y a rien à décomposer.
-		String restmp="";
-		char tmpc=0;
-
-		int i=0, tmp1 = Integer.parseInt(n0.ent), tmp1len = (""+tmp1).length();
-
-		aff("n = "+tmp1);
-
-		while (! estPremier(tmp1)) {
-			tmp1len = (""+tmp1).length();
-			tmpc = (""+tmp1).charAt(tmp1len-1);
-			if (tmpc==0 || tmpc==5) {
-				restmp+="5:";
-				tmp1 = tmp1/5;
-			}
-			else if (tmpc==2 || tmpc==4 || tmpc==8) {
-				restmp+="2:";
-				tmp1 = tmp1/2;
-			}
-			else if (tmp1%3==0) {
-				restmp+="3:";
-				tmp1 = tmp1/3;
-			}
-			else {
-				for (i=2; i<tmp1 && tmp1%i!=0; i++) {}
-				restmp+=i+":";
-				tmp1 = tmp1/i;
-			}
-			if (tmp1==0) tmp1=1;
-			// erreur de conversion après une division entière.
-
-			aff("n = "+tmp1);
+	/**
+	 * Decompose un nombre en facteurs premiers.
+	 * Ignore la partie decimale (troncature).
+	 * @param nombre CalculsDouble a decomposer.
+	 * @return Tableau des facteurs premiers ou null si invalide.
+	 */
+	public int[] decompose_en_facteurs_premiers(CalculsDouble nombre) {
+		if (!nombre.partieDecimale.isEmpty()) {
+			aff("n0.dec!=" + '"' + '"' + " : on prend la troncature entiere du nombre.");
 		}
-
-		restmp+=""+tmp1;
-		String [] res0 = restmp.split(":");
-		int cmp2=0;
-		for (i=0; i<res0.length; i++) {
-			if (!res0[i].isEmpty()) cmp2++;
+		if (nombre.partieEntiere.isEmpty()) {
+			return null;
 		}
-		int [] res = new int[cmp2];
-		cmp2=0;
-		for (i=0; i<res0.length; i++) {
-			if (!res0[i].isEmpty()) {
-				res[cmp2] = Integer.parseInt(res0[i]);
-				cmp2++;
-			}
-		}
-
-		aff("restmp = "+restmp);
-		int ver=1;
-		for (i=0; i<res.length; i++) ver*=res[i];
-		aff("Verification : n = "+ver);
-
-		return res;
+		int valeurCourante = Integer.parseInt(nombre.partieEntiere);
+		aff("n = " + valeurCourante);
+		String facteursChaine = construireChaineFacteurs(valeurCourante);
+		return convertirEnTableauFacteurs(facteursChaine);
 	}
 
+	/**
+	 * Construit la chaine des facteurs premiers separes par :.
+	 * @param valeur Valeur a factoriser.
+	 * @return Chaine des facteurs (ex: "2:3:5:7").
+	 */
+	private String construireChaineFacteurs(int valeur) {
+		String facteursChaine = "";
+		while (!estPremier(valeur)) {
+			int facteur = trouverPremierFacteur(valeur);
+			facteursChaine += facteur + ":";
+			valeur = valeur / facteur;
+			if (valeur == 0) {
+				valeur = 1;
+			}
+			aff("n = " + valeur);
+		}
+		facteursChaine += "" + valeur;
+		return facteursChaine;
+	}
 
+	/**
+	 * Trouve le premier facteur premier d'un nombre.
+	 * @param valeur Nombre a factoriser.
+	 * @return Premier facteur trouve.
+	 */
+	private int trouverPremierFacteur(int valeur) {
+		int longueur = ("" + valeur).length();
+		char dernierChiffre = ("" + valeur).charAt(longueur - 1);
+		if (dernierChiffre == '0' || dernierChiffre == '5') {
+			return 5;
+		}
+		if (dernierChiffre == '2' || dernierChiffre == '4' || dernierChiffre == '8') {
+			return 2;
+		}
+		if (valeur % 3 == 0) {
+			return 3;
+		}
+		for (int diviseur = 2; diviseur < valeur && valeur % diviseur != 0; diviseur++) {
+		}
+		return valeur;
+	}
 
+// ------------------------------------------------------------------------------
+// Conversion et verification
+// ------------------------------------------------------------------------------
+
+	/**
+	 * Convertit une chaine de facteurs en tableau d'entiers.
+	 * @param facteursChaine Chaine de facteurs separes par :.
+	 * @return Tableau des facteurs.
+	 */
+	private int[] convertirEnTableauFacteurs(String facteursChaine) {
+		aff("restmp = " + facteursChaine);
+		String[] facteursSplit = facteursChaine.split(":");
+		int nombreFacteurs = compterFacteursValides(facteursSplit);
+		int[] resultat = remplirTableauFacteurs(facteursSplit, nombreFacteurs);
+		afficherVerification(resultat);
+		return resultat;
+	}
+
+	/**
+	 * Compte le nombre de facteurs valides dans le tableau.
+	 * @param facteurs Tableau de chaines.
+	 * @return Nombre de chaines non vides.
+	 */
+	private int compterFacteursValides(String[] facteurs) {
+		int compteur = 0;
+		for (int index = 0; index < facteurs.length; index++) {
+			if (!facteurs[index].isEmpty()) {
+				compteur++;
+			}
+		}
+		return compteur;
+	}
+
+	/**
+	 * Remplit un tableau d'entiers avec les facteurs valides.
+	 * @param facteurs Tableau de chaines.
+	 * @param nombreFacteurs Taille du tableau resultat.
+	 * @return Tableau d'entiers.
+	 */
+	private int[] remplirTableauFacteurs(String[] facteurs, int nombreFacteurs) {
+		int[] resultat = new int[nombreFacteurs];
+		int indexResultat = 0;
+		for (int index = 0; index < facteurs.length; index++) {
+			if (!facteurs[index].isEmpty()) {
+				resultat[indexResultat] = Integer.parseInt(facteurs[index]);
+				indexResultat++;
+			}
+		}
+		return resultat;
+	}
+
+	/**
+	 * Affiche la verification du produit des facteurs.
+	 * @param facteurs Tableau des facteurs.
+	 */
+	private void afficherVerification(int[] facteurs) {
+		int verification = 1;
+		for (int index = 0; index < facteurs.length; index++) {
+			verification *= facteurs[index];
+		}
+		aff("Verification : n = " + verification);
+	}

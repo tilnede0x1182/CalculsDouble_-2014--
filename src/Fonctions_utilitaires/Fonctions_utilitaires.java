@@ -1,114 +1,133 @@
 
 	/**
-		Shows if a String is an Integer 
-		using function Integer.parseInt(String) of Java.
-	**/
-	public boolean isInteger (String n0) {
+	 * Verifie si une chaine represente un entier valide.
+	 * Utilise Integer.parseInt pour la verification.
+	 * @param chaine Chaine a tester.
+	 * @return True si la chaine est un entier valide.
+	 */
+	public boolean isInteger(String chaine) {
 		try {
-			int n1 = Integer.parseInt(n0);
+			int nombre = Integer.parseInt(chaine);
 			return true;
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException exception) {
 			return false;
 		}
 	}
 
 	/**
-		Convertit un String en entier (gestion des exceptions).
-	**/
-	public int convertStrInt (String n0) {
-		if (n0==null) {
+	 * Convertit une chaine en entier avec gestion des erreurs.
+	 * @param chaine Chaine a convertir.
+	 * @return Valeur entiere ou -1 en cas d'erreur.
+	 */
+	public int convertStrInt(String chaine) {
+		if (chaine == null) {
 			aff("n0 est null");
 			return -1;
 		}
-		if (n0.isEmpty()) {
-			aff("n0 est egal a "+'"'+'"'+".");
+		if (chaine.isEmpty()) {
+			aff("n0 est egal a " + '"' + '"' + ".");
 			return -1;
 		}
 		try {
-			return Integer.parseInt(n0);
-		}
-		catch(NumberFormatException e) {
+			return Integer.parseInt(chaine);
+		} catch (NumberFormatException exception) {
 			aff("Impossible de convertir ");
 			return -1;
 		}
 	}
 
 	/**
-		Vérifie si un char est un chiffre 
-		ou non.
-	**/
-	public boolean isCharNumber (char n0) {
-		return (n0>='0' && n0<='9');
+	 * Verifie si un caractere est un chiffre (0-9).
+	 * @param caractere Caractere a tester.
+	 * @return True si le caractere est un chiffre.
+	 */
+	public boolean isCharNumber(char caractere) {
+		return (caractere >= '0' && caractere <= '9');
 	}
 
-	public boolean isInteger_deep (String n0) {
-		if (n0.isEmpty()) return false;
-		int n0len = n0.length();
-
-		for (int i=0; i<n0len; i++) {
-			if (!isCharNumber(n0.charAt(i))) return false;
+	/**
+	 * Verifie si une chaine contient uniquement des chiffres.
+	 * @param chaine Chaine a tester.
+	 * @return True si tous les caracteres sont des chiffres.
+	 */
+	public boolean isInteger_deep(String chaine) {
+		if (chaine.isEmpty()) {
+			return false;
 		}
+		int longueurChaine = chaine.length();
+		for (int index = 0; index < longueurChaine; index++) {
+			if (!isCharNumber(chaine.charAt(index))) {
+				return false;
+			}
+		}
+		return true;
+	}
 
+// ------------------------------------------------------------------------------
+// Verification de nombres CalculsDouble
+// ------------------------------------------------------------------------------
+
+	/**
+	 * Verifie si un CalculsDouble est un nombre valide.
+	 * @param nombre CalculsDouble a tester.
+	 * @return True si ent et dec sont des nombres valides.
+	 */
+	public boolean isInteger(CalculsDouble nombre) {
+		boolean resultat = false;
+		String partieEntiere = nombre.partieEntiere;
+		String partieDecimale = nombre.partieDecimale;
+		if (!partieEntiere.isEmpty()) {
+			resultat = isInteger(partieEntiere);
+		}
+		if (!partieDecimale.isEmpty()) {
+			resultat = isInteger(partieDecimale);
+		}
+		return resultat;
+	}
+
+	/**
+	 * Verifie si un CalculsDouble est egal a zero.
+	 * @param nombre CalculsDouble a tester.
+	 * @return True si le nombre vaut 0 ou 0.0.
+	 */
+	public boolean estNul(CalculsDouble nombre) {
+		if (!isInteger(nombre)) {
+			return false;
+		}
+		int longueurEntiere = nombre.partieEntiere.length();
+		int longueurDecimale = 0;
+		if (!nombre.partieDecimale.isEmpty()) {
+			longueurDecimale = nombre.partieDecimale.length();
+		}
+		for (int index = 0; index < longueurEntiere; index++) {
+			if (nombre.partieEntiere.charAt(index) != '0') {
+				return false;
+			}
+		}
+		for (int index = 0; index < longueurDecimale; index++) {
+			if (nombre.partieDecimale.charAt(index) != '0') {
+				return false;
+			}
+		}
 		return true;
 	}
 
 	/**
-		Regarde si CalculsDouble n0 est un nombre.
-		Renvoie true si n0.ent est un nombre
-		et que n0.dec est vide ou un nombre aussi.
-	**/
-	public boolean isInteger (CalculsDouble n0) {
-		boolean res = false;
-		int i=0;
-		String n0ent = n0.ent;
-		String n0dec = n0.dec;
-
-		if (!n0ent.isEmpty()) {
-			res = isInteger(n0ent);
+	 * Compte les occurrences d'un caractere dans une chaine.
+	 * @param chaine Chaine a analyser.
+	 * @param caractere Caractere a compter.
+	 * @return Nombre d'occurrences.
+	 */
+	public int compteOcurrences(String chaine, char caractere) {
+		if (chaine == null || chaine.isEmpty()) {
+			return 0;
 		}
-		if (!n0dec.isEmpty()) {
-			res = isInteger(n0dec);
+		int resultat = 0;
+		int longueurChaine = chaine.length();
+		for (int index = 0; index < longueurChaine; index++) {
+			if (chaine.charAt(index) == caractere) {
+				resultat++;
+			}
 		}
-
-		return res;
-	}
-
-	/**
-		Renvoie true si n0=0.0
-		ou 0.
-	**/
-	public boolean estNul (CalculsDouble n0) {
-		int i=0;
-		int n0entlen = n0.ent.length();
-		int n0declen = 0;
-
-		if (!isInteger(n0)) return false;
-
-		if (!n0.dec.isEmpty())
-			n0declen = n0.dec.length();
-
-		for (i=0; i<n0entlen; i++) {
-			if (n0.ent.charAt(i)!='0')
-				return false;
-		}
-
-		for (i=0; i<n0declen; i++) {
-			if (n0.dec.charAt(i)!='0')
-				return false;
-		}
-
-		return true;
-	}
-
-	public int compteOcurrences (String test, char cc) {
-		if (test==null) return 0;
-		if (test.isEmpty()) return 0;
-		// Gestion des erreurs
-
-		int res = 0, lentest = test.length();
-		for (int i=0; i<lentest; i++) {
-			if (test.charAt(i)==cc) res++;
-		}
-		return res;
+		return resultat;
 	}

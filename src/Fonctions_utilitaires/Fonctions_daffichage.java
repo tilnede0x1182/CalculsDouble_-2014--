@@ -1,41 +1,61 @@
 
-	public static void affnn (Object s0) {
-		System.out.print(""+s0);
+	/**
+	 * Affiche un objet sans retour a la ligne.
+	 * @param objet Objet a afficher.
+	 */
+	public static void affnn(Object objet) {
+		System.out.print("" + objet);
 	}
 
-	public static void aff (Object s0) {
-		System.out.println(""+s0);
+	/**
+	 * Affiche un objet avec retour a la ligne.
+	 * @param objet Objet a afficher.
+	 */
+	public static void aff(Object objet) {
+		System.out.println("" + objet);
 	}
 
-	public void affTab(int [] n0) {
-		for (int i=0; i<n0.length; i++) {
-			aff("t["+i+"] = "+n0[i]);
+	/**
+	 * Affiche un tableau d'entiers avec nom par defaut.
+	 * @param tableau Tableau a afficher.
+	 */
+	public void affTab(int[] tableau) {
+		for (int index = 0; index < tableau.length; index++) {
+			aff("t[" + index + "] = " + tableau[index]);
 		}
 	}
 
-	public void affTab(int [] n0, String nom) {
-		for (int i=0; i<n0.length; i++) {
-			aff(nom+"["+i+"] = "+n0[i]);
+	/**
+	 * Affiche un tableau d'entiers avec nom personnalise.
+	 * @param tableau Tableau a afficher.
+	 * @param nomTableau Nom a utiliser pour l'affichage.
+	 */
+	public void affTab(int[] tableau, String nomTableau) {
+		for (int index = 0; index < tableau.length; index++) {
+			aff(nomTableau + "[" + index + "] = " + tableau[index]);
 		}
 	}
 
-	public void afftab2dim(String [] t1, String nom) {
-		int i;
-
-		//aff(nom+" : ");
-
-		for (i=0; i<t1.length; i++) {
-			aff(nom+"["+i+"] = "+t1[i]);
+	/**
+	 * Affiche un tableau de chaines avec nom personnalise.
+	 * @param tableau Tableau de chaines a afficher.
+	 * @param nomTableau Nom a utiliser pour l'affichage.
+	 */
+	public void afftab2dim(String[] tableau, String nomTableau) {
+		for (int index = 0; index < tableau.length; index++) {
+			aff(nomTableau + "[" + index + "] = " + tableau[index]);
 		}
 	}
 
-	public int [] agrandieTab (int [] t0) {
-		int i;
-		int [] t1 = new int[t0.length*2+1];
-
-		for (i = 0; i<t0.length; i++) {
-			t1[i] = t0[i];
+	/**
+	 * Agrandit un tableau d'entiers (double la taille + 1).
+	 * @param tableauOriginal Tableau a agrandir.
+	 * @return Nouveau tableau agrandi.
+	 */
+	public int[] agrandieTab(int[] tableauOriginal) {
+		int[] nouveauTableau = new int[tableauOriginal.length * 2 + 1];
+		for (int index = 0; index < tableauOriginal.length; index++) {
+			nouveauTableau[index] = tableauOriginal[index];
 		}
-
-		return t1;
+		return nouveauTableau;
 	}
