@@ -2,9 +2,6 @@
 build/
 *.class
 
-# Javadoc générée
-javadoc/
-
 # Fichier généré par préprocesseur
 src/CalculsDouble_modifie.java
 
