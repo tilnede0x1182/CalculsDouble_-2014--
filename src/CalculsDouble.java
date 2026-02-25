@@ -13,14 +13,14 @@ class CalculsDouble {
 
 	import Fonctions_utilitaires\Constructeurs.java
 
-// ################################# Opérations ######################################## //
+// ################################# OpÃ©rations ######################################## //
 
 	import Operations\Les_4_operations\Addition.java
 	import Operations\Les_4_operations\Multiplication.java
 	import Operations\Les_4_operations\Soustraction.java
 	import Operations\Les_4_operations\Division.java
 
-// ########################## Fonctions mathématiques ################################## //
+// ########################## Fonctions mathÃ©matiques ################################## //
 
 	import Operations\Operations_utilitaires\Gestion_des_0.java
 	import Operations\Operations_mathematiques\Chiffres_significatifs.java
@@ -43,7 +43,7 @@ class CalculsDouble {
 
 	import Fonctions_utilitaires\toString.java
 
-// ######################## Reconnaissance opérations ################################## //
+// ######################## Reconnaissance opÃ©rations ################################## //
 
 	import Operations\Reconnaissance_expression\Reconnaissance_doubles_sans_parentheses.java
 }

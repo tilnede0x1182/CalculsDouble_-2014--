@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.util.Stack;
 import java.util.HashSet;
 import java.util.ArrayList;
@@ -61,84 +62,65 @@ class CalculsDouble {
 	}
 
 
-// ################################# Opérations ######################################## //
+// ################################# OpÃ©rations ######################################## //
+
+	private static String padRight(String value, int targetLength) {
+		StringBuilder sb = new StringBuilder(value);
+		while (sb.length() < targetLength) {
+			sb.append('0');
+		}
+		return sb.toString();
+	}
+
+	private static String padLeft(String value, int targetLength) {
+		StringBuilder sb = new StringBuilder(value);
+		while (sb.length() < targetLength) {
+			sb.insert(0, '0');
+		}
+		return sb.toString();
+	}
+
+	private BigInteger toScaledBigInteger(CalculsDouble nombre, int scale) {
+		String digits = nombre.ent + padRight(nombre.dec, scale);
+		if (digits.isEmpty()) {
+			digits = "0";
+		}
+		BigInteger valeur = new BigInteger(digits);
+		if (nombre.estNegatif && valeur.signum() != 0) {
+			valeur = valeur.negate();
+		}
+		return valeur;
+	}
+
+	private CalculsDouble fromScaledValue(BigInteger valeur, int scale) {
+		CalculsDouble res = new CalculsDouble();
+		res.estNegatif = valeur.signum() < 0;
+		BigInteger absolue = valeur.abs();
+		String digits = absolue.toString();
+		if (scale == 0) {
+			res.ent = digits;
+			res.dec = "";
+		} else {
+			if (digits.length() <= scale) {
+				digits = padLeft(digits, scale + 1);
+			}
+			int split = digits.length() - scale;
+			res.ent = digits.substring(0, split);
+			res.dec = digits.substring(split);
+			res.dec = res.dec.replaceFirst("0+$", "");
+		}
+		if (res.ent.isEmpty()) res.ent = "0";
+		if (res.dec == null) res.dec = "";
+		if (res.ent.equals("0") && res.dec.isEmpty()) {
+			res.estNegatif = false;
+		}
+		return res;
+	}
 
 	public CalculsDouble additionneNombres (CalculsDouble a, CalculsDouble b){
-		int recul = 0;
-		int chiffres_avant_la_virgule = Math.min(compteOcurrences(a.dec, 
-			'0'), compteOcurrences(b.dec, '0'));
-		CalculsDouble c = new CalculsDouble ();
-
-		//aff("a = "+a+"\nb = "+b+"\n");
-
-		CalculsDouble [] tmpCD = egaliseNombres(a, b); 
-		a = tmpCD[0]; b = tmpCD[1];
-
-		/*************** Intégration du signe "-" ************************/
-		if (a.estNegatif && b.estNegatif) {
-			c.estNegatif = true;
-		}
-		else if (a.estNegatif || b.estNegatif) {
-			//aff("a.estNegatif || b.estNegatif");
-
-			int cmpnbr0 = compareNombres_abs (a, b);
-
-			if (cmpnbr0==0) { 
-				c.ent="0"; c.dec=""; c.estNegatif=false;
-			}
-			if (cmpnbr0==2) {
-				CalculsDouble d = a;
-				a = b; // on fait en sorte que a>b
-				b = d; // (échange de a et b sinon)
-			}
-
-			if (!a.estNegatif && b.estNegatif) {
-				a.estNegatif=false; b.estNegatif=false;
-
-				return (soustraitNombres(a, b));
-			}
-			if (a.estNegatif && !b.estNegatif) {
-				a.estNegatif=false; b.estNegatif=false;
-
-				c = soustraitNombres(a, b);
-				c.estNegatif = true;
-
-				return c;
-			}
-		}
-		/*****************************************************************/
-
-
-		c.ent = ""+(Integer.parseInt(a.ent)+Integer.parseInt(b.ent));
-		if (!a.dec.isEmpty() && !b.dec.isEmpty()) c.dec = ""+
-			(Integer.parseInt(a.dec)+Integer.parseInt(b.dec));
-		else c.dec="";
-
-		if (!a.dec.isEmpty() && !b.dec.isEmpty()) {
-			if (Integer.parseInt(""+a.dec.charAt(0))+
-					Integer.parseInt(""+b.dec.charAt(0))>9) {
-				c.ent = ""+(Integer.parseInt(c.ent)+1);
-				c.dec = c.dec.substring(1, c.dec.length());
-			}
-		}
-
-		if (c.dec.contains("-")) {
-			c.estNegatif = true;
-			c.dec = c.dec.replace("-", "");
-		}
-
-		c.ent = c.ent.replace("-", ""); // au cas où
-
-		if (!c.dec.isEmpty()) {
-			if (a.dec.charAt(0)=='0' || b.dec.charAt(0)=='0') 
-				recul = 1;
-	
-			for (int i = 0; i<chiffres_avant_la_virgule+recul-2; i++){
-				c.dec = "0"+c.dec;
-			}
-		}
-
-		return c;
+		int scale = Math.max(a.dec.length(), b.dec.length());
+		BigInteger somme = toScaledBigInteger(a, scale).add(toScaledBigInteger(b, scale));
+		return fromScaledValue(somme, scale);
 	}
 
 	public CalculsDouble mult (CalculsDouble a, CalculsDouble b) {
@@ -159,7 +141,7 @@ class CalculsDouble {
 		if (b.ent.length()+b.dec.length()>a.ent.length()+a.dec.length()) {
 			CalculsDouble d = a;
 			a = b; // On fait en sorte que len(a)>len(b)
-			b = d; // On échange a et b sinon.
+			b = d; // On Ã©change a et b sinon.
 		}
 
 		String aent = ""+a.ent+a.dec, bent = ""+b.ent+b.dec;
@@ -225,44 +207,14 @@ class CalculsDouble {
 		int chiffres_avant_la_virgule = Math.min(compteOcurrences(a.dec, 
 			'0'), compteOcurrences(b.dec, '0'));
 		CalculsDouble c = new CalculsDouble ();
-		CalculsDouble [] tmpCD = egaliseNombres(a, b); a = tmpCD[0]; 
-			b = tmpCD[1];
-
-		/******************************** Intégration du signe "-" **/
-		if (a.estNegatif || b.estNegatif) {
-			if (a.estNegatif) a.ent = "-"+a.ent;
-			if (b.estNegatif) b.ent = "-"+b.ent;
+		CalculsDouble oppose = copie(b);
+		boolean estZero = oppose.ent.equals("0") && (oppose.dec.isEmpty() || oppose.dec.replace("0", "").isEmpty());
+		if (!estZero) {
+			oppose.estNegatif = !oppose.estNegatif;
+		} else {
+			oppose.estNegatif = false;
 		}
-		/************************************************************/
-
-		c.ent = ""+(Integer.parseInt(a.ent)-Integer.parseInt(b.ent));
-		if (!a.dec.isEmpty() && !b.dec.isEmpty()) 
-			c.dec = ""+(Integer.parseInt(a.dec)
-				-Integer.parseInt(b.dec));
-		else {
-			c.dec="";
-			if (c.ent.contains("-") || c.dec.contains("-")) {
-				c.estNegatif=true;
-				c.ent = c.ent.replace("-", "");
-				c.dec = c.dec.replace("-", "");
-			}
-			return c;
-		}
-
-		if (c.dec.contains("-")) {
-			c.estNegatif = true;
-			c.dec = c.dec.replace("-", "");
-		}
-
-		c.ent = c.ent.replace("-", ""); // au cas où
-
-		if (a.dec.charAt(0)=='0' || b.dec.charAt(0)=='0') recul = 1;
-
-		for (int i = 0; i<chiffres_avant_la_virgule+recul-2; i++) {
-			c.dec = "0"+c.dec;
-		}
-
-		return c;
+		return additionneNombres(a, oppose);
 	}
 
 	public CalculsDouble [] division_boucle (CalculsDouble a, 
@@ -351,7 +303,7 @@ class CalculsDouble {
 			}
 			q = additionneNombres(q, tmp2);
 
-			//########### Instruction r = r - b (On est obligé #######
+			//########### Instruction r = r - b (On est obligÃ© #######
 			//##################de le mettre deux fois) ##############
 			apres_la_virgule = (!(compareNombres(r, tmp)==0 
 				|| compareNombres(r, tmp)==1));
@@ -390,10 +342,10 @@ class CalculsDouble {
 	}**/
 
 
-// ########################## Fonctions mathématiques ################################## //
+// ########################## Fonctions mathÃ©matiques ################################## //
 
 	/**
-		Enlève les zéros en début de string dans la partie entiere (String ent).
+		EnlÃ¨ve les zÃ©ros en dÃ©but de string dans la partie entiere (String ent).
 	**/
 	public String epureZerosEnt (String ent) {
 		boolean plus_de_zeros = false;
@@ -401,7 +353,7 @@ class CalculsDouble {
 
 		/**
 		**	Parcours le str pour savoir s'il n'ya a plus de zeros (boolean) 
-		**	et dès qu'on a fini, enlève les zeros en trop.
+		**	et dÃ¨s qu'on a fini, enlÃ¨ve les zeros en trop.
 		**/
 		res = lenent;
 		int i=0;
@@ -423,7 +375,7 @@ class CalculsDouble {
 
 		/**
 		**	Parcours le str pour savoir s'il n'ya a plus de zeros (boolean) 
-		**	et dès qu'on a fini, enlève les zeros en trop.
+		**	et dÃ¨s qu'on a fini, enlÃ¨ve les zeros en trop.
 		**/
 		res = lendec;
 		for (int i=0; i<lendec; i++) {
@@ -445,14 +397,14 @@ class CalculsDouble {
 		int nbrZeros = nn-lendec;
 
 		/**
-			enlèves les zéros inutils (sans les compter au préalable 
-			(plus simple à coder))
+			enlÃ¨ves les zÃ©ros inutils (sans les compter au prÃ©alable 
+			(plus simple Ã  coder))
 		**/
 		dec = envleveZerosInutils (dec);
 
 		if (nn == -1) return dec; 
-		// cas de base (on enlève 
-		// le plus de zéros possibles, comme en maths).
+		// cas de base (on enlÃ¨ve 
+		// le plus de zÃ©ros possibles, comme en maths).
 
 		/* Ajoute des zeros si besoin */
 		for (int i=0; i<nbrZeros; i++) {
@@ -511,12 +463,12 @@ class CalculsDouble {
 	/**
 		fonction arrondi (CalculsDouble n0, int r0) :
 
-		r0 = 0 : aucune décimale
-		r0 = 1 : 1 décimale
+		r0 = 0 : aucune dÃ©cimale
+		r0 = 1 : 1 dÃ©cimale
 		.
 		.
 		.
-		r0 = n : n décimale(s)
+		r0 = n : n dÃ©cimale(s)
 
 	**/
 	public CalculsDouble arrondi (CalculsDouble n1, int r0) {
@@ -524,7 +476,7 @@ class CalculsDouble {
 		CalculsDouble n0 = copie(n1);
 		boolean isok = true;
 		int tmp = r0;
-		if (r0<1) { // r0<1 => aucune décimale.
+		if (r0<1) { // r0<1 => aucune dÃ©cimale.
 			if (n0.dec.isEmpty()) return n0;
 			else {
 				if (Integer.parseInt(""+n0.dec.charAt(0))>4)
@@ -534,7 +486,6 @@ class CalculsDouble {
 			return n0;
 		}
 		if (n0.dec.isEmpty()) {
-			n0.estNegatif=true;
 			return n0;
 		}
 		else {
@@ -681,7 +632,7 @@ class CalculsDouble {
 				return 2;
 		}
 
-		// donc les parties entières sont identiques
+		// donc les parties entiÃ¨res sont identiques
 		int xlen = Math.min(a.dec.length(), b.dec.length());
 		for (int i=0;  i<xlen;  i++) {
 			if (Integer.parseInt(""+a.dec.charAt(i))>Integer.parseInt(""+b.dec.charAt(i)))
@@ -702,9 +653,9 @@ class CalculsDouble {
 
 	public int [] decompose_en_facteurs_premiers (CalculsDouble n0) {
 		if (!n0.dec.isEmpty()) aff("n0.dec!="+'"'+'"'+" : on "
-					+"prend la troncature entière du nombre.");
+					+"prend la troncature entiÃ¨re du nombre.");
 		if (n0.ent.isEmpty()) return null; 
-		// si n0.ent="", il n'y a rien à décomposer.
+		// si n0.ent="", il n'y a rien Ã  dÃ©composer.
 		String restmp="";
 		char tmpc=0;
 
@@ -733,7 +684,7 @@ class CalculsDouble {
 				tmp1 = tmp1/i;
 			}
 			if (tmp1==0) tmp1=1;
-			// erreur de conversion après une division entière.
+			// erreur de conversion aprÃ¨s une division entiÃ¨re.
 
 			aff("n = "+tmp1);
 		}
@@ -767,7 +718,7 @@ class CalculsDouble {
 
 	public int somme_des_chiffres (String n0) {
 		int i, n0len = n0.length(), res=0;
-		if (n0.isEmpty()) return 0; // rien à traiter si n0="".
+		if (n0.isEmpty()) return 0; // rien Ã  traiter si n0="".
 
 		for (i=0; i<n0len; i++) {
 			res+=Integer.parseInt(""+n0.charAt(i));
@@ -778,7 +729,7 @@ class CalculsDouble {
 
 	public int produit_des_chiffres (String n0) {
 		int i, n0len = n0.length(), res=1;
-		if (n0.isEmpty()) return 0; // rien à traiter si n0="".
+		if (n0.isEmpty()) return 0; // rien Ã  traiter si n0="".
 
 		for (i=0; i<n0len; i++) {
 			res*=Integer.parseInt(""+n0.charAt(i));
@@ -797,7 +748,7 @@ class CalculsDouble {
 	public void clacule_n_premiers (int n0) {
 		int i, cmp=0;
 
-		if (n0<1) return; // rien à afficher
+		if (n0<1) return; // rien Ã  afficher
 
 		int [] res = new int[n0];
 
@@ -857,7 +808,7 @@ class CalculsDouble {
 	}
 
 	/**
-		Vérifie si un char est un chiffre 
+		VÃ©rifie si un char est un chiffre 
 		ou non.
 	**/
 	public boolean isCharNumber (char n0) {
@@ -997,7 +948,7 @@ class CalculsDouble {
 		return (signeMoins+affent+affDec);
 	}
 
-// ######################## Reconnaissance opérations ################################## //
+// ######################## Reconnaissance opÃ©rations ################################## //
 
 
 	Character [] operateurs_tmp = 
