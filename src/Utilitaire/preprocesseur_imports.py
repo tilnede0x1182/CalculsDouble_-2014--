@@ -123,15 +123,54 @@ def corriger_encodage_utf8(contenu):
 	return resultat
 
 # ------------------------------------------------------------------------------
+## Détection type d'import
+# ------------------------------------------------------------------------------
+
+"""
+	Vérifie si un import est un import Java standard (à ignorer).
+	Les imports Java standard contiennent un point-virgule et des points.
+	Ex: "java.util.Stack;" → True
+	Ex: "Fonctions_utilitaires/Constructeurs.java" → False
+
+	@param nom_import Nom extrait après "import "
+	@return True si import Java standard, False si import fichier local
+"""
+def est_import_java_standard(nom_import):
+	if ';' in nom_import:
+		return True
+	if '.' in nom_import and '\\' not in nom_import and '/' not in nom_import:
+		partie_avant_extension = nom_import.rsplit('.', 1)[0]
+		if '.' in partie_avant_extension:
+			return True
+	return False
+
+# ------------------------------------------------------------------------------
+## Normalisation des chemins cross-platform
+# ------------------------------------------------------------------------------
+
+"""
+	Normalise un chemin pour le système d'exploitation courant.
+	Convertit les séparateurs Windows (backslash) et Unix (/) vers os.sep.
+
+	@param chemin Chemin à normaliser (peut contenir backslash ou /)
+	@return Chemin avec séparateurs adaptés au système courant
+"""
+def normaliser_chemin(chemin):
+	chemin_normalise = chemin.replace('\\', os.sep)
+	chemin_normalise = chemin_normalise.replace('/', os.sep)
+	return chemin_normalise
+
+# ------------------------------------------------------------------------------
 ## Extraction de chemins
 # ------------------------------------------------------------------------------
 
 """
 	Extrait le nom de fichier après un marqueur d'import jusqu'à la fin de ligne.
+	Normalise automatiquement les séparateurs de chemin pour le système courant.
 
 	@param contenu Contenu source complet
 	@param position_debut Position de départ après "import "
-	@return Nom de fichier extrait (nettoyé des espaces)
+	@return Nom de fichier extrait (nettoyé et normalisé)
 """
 def extraire_nom_fichier_import(contenu, position_debut):
 	nom_fichier = ""
@@ -139,7 +178,8 @@ def extraire_nom_fichier_import(contenu, position_debut):
 	while position < len(contenu) and contenu[position] != '\n':
 		nom_fichier += contenu[position]
 		position += 1
-	return supprime_espaces_inutiles(nom_fichier)
+	chemin_brut = supprime_espaces_inutiles(nom_fichier)
+	return normaliser_chemin(chemin_brut)
 
 
 """
@@ -178,6 +218,8 @@ def detecter_imports(contenu_source):
 		if contenu_source[index:index + longueur_marqueur] == MARQUEUR_IMPORT:
 			position_nom = index + longueur_marqueur
 			nom_fichier = extraire_nom_fichier_import(contenu_source, position_nom)
+			if est_import_java_standard(nom_fichier):
+				continue
 			liste_fichiers.append(nom_fichier)
 
 	return liste_fichiers
@@ -252,6 +294,13 @@ def remplacer_imports_par_contenu(contenu_source):
 
 	for index_ligne, ligne in enumerate(lignes_source):
 		if MARQUEUR_IMPORT in ligne:
+			position_nom = ligne.find(MARQUEUR_IMPORT) + len(MARQUEUR_IMPORT)
+			nom_import = ligne[position_nom:].strip()
+			if est_import_java_standard(nom_import):
+				resultat += ligne
+				if index_ligne < len(lignes_source) - 1:
+					resultat += '\n'
+				continue
 			resultat += traiter_ligne_import(ligne, contenus_fichiers[index_import])
 			if contenus_fichiers[index_import] != "":
 				resultat += '\n'

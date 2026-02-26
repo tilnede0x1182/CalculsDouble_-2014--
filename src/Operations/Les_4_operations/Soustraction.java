@@ -1,11 +1,42 @@
 	/**
 	 * Soustrait deux CalculsDouble (A - B).
-	 * Utilise l'addition avec l'oppose de B.
+	 * Gere les signes et delègue à soustraitNombresPositifs.
 	 * @param nombreA Premier nombre.
 	 * @param nombreB Second nombre a soustraire.
 	 * @return Resultat de la soustraction.
 	 */
 	public CalculsDouble soustraitNombres(CalculsDouble nombreA, CalculsDouble nombreB) {
+		boolean signeA = nombreA.estNegatif;
+		boolean signeB = nombreB.estNegatif;
+		CalculsDouble absA = copie(nombreA);
+		CalculsDouble absB = copie(nombreB);
+		absA.estNegatif = false;
+		absB.estNegatif = false;
+		if (!signeA && !signeB) {
+			return soustraitNombresPositifs(absA, absB);
+		}
+		if (signeA && signeB) {
+			return soustraitNombresPositifs(absB, absA);
+		}
+		if (!signeA && signeB) {
+			CalculsDouble resultat = additionneNombresPositifs(absA, absB);
+			return resultat;
+		}
+		if (signeA && !signeB) {
+			CalculsDouble resultat = additionneNombresPositifs(absA, absB);
+			resultat.estNegatif = true;
+			return resultat;
+		}
+		return new CalculsDouble();
+	}
+
+	/**
+	 * Soustrait deux CalculsDouble positifs (A - B).
+	 * @param nombreA Premier nombre positif.
+	 * @param nombreB Second nombre positif.
+	 * @return Resultat de la soustraction.
+	 */
+	private CalculsDouble soustraitNombresPositifs(CalculsDouble nombreA, CalculsDouble nombreB) {
 		int chiffresAvantVirgule = Math.min(
 			compteOcurrences(nombreA.partieDecimale, '0'),
 			compteOcurrences(nombreB.partieDecimale, '0')
@@ -14,8 +45,36 @@
 		CalculsDouble[] nombresEgalises = egaliseNombres(nombreA, nombreB);
 		nombreA = nombresEgalises[0];
 		nombreB = nombresEgalises[1];
-		integrerSignesPourSoustraction(nombreA, nombreB);
 		resultat = calculerDifference(nombreA, nombreB, resultat, chiffresAvantVirgule);
+		return resultat;
+	}
+
+	/**
+	 * Additionne deux CalculsDouble positifs (sans gestion de signe).
+	 * @param nombreA Premier nombre positif.
+	 * @param nombreB Second nombre positif.
+	 * @return Resultat de l'addition.
+	 */
+	private CalculsDouble additionneNombresPositifs(CalculsDouble nombreA, CalculsDouble nombreB) {
+		int chiffresAvantVirgule = Math.min(
+			compteOcurrences(nombreA.partieDecimale, '0'),
+			compteOcurrences(nombreB.partieDecimale, '0')
+		);
+		CalculsDouble[] nombresEgalises = egaliseNombres(nombreA, nombreB);
+		nombreA = nombresEgalises[0];
+		nombreB = nombresEgalises[1];
+		CalculsDouble resultat = new CalculsDouble();
+		resultat.partieEntiere = additionneChaines(nombreA.partieEntiere, nombreB.partieEntiere);
+		if (!nombreA.partieDecimale.isEmpty() && !nombreB.partieDecimale.isEmpty()) {
+			resultat.partieDecimale = additionneChaines(nombreA.partieDecimale, nombreB.partieDecimale);
+			int sommePremiersChiffres = chiffreVersInt(nombreA.partieDecimale.charAt(0)) + chiffreVersInt(nombreB.partieDecimale.charAt(0));
+			if (sommePremiersChiffres > 9) {
+				resultat.partieEntiere = incrementeChaine(resultat.partieEntiere);
+				resultat.partieDecimale = resultat.partieDecimale.substring(1);
+			}
+		} else {
+			resultat.partieDecimale = "";
+		}
 		return resultat;
 	}
 
