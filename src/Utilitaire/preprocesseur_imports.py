@@ -8,6 +8,9 @@
 
 	Usage :
 		python preprocesseur_imports.py fichier_source.py [suffixe_sortie]
+
+	Le suffixe_sortie est optionnel (défaut : "modifie").
+	Produit fichier_source_modifie.py ou fichier_source_modifie.java.
 """
 
 # ==============================================================================
