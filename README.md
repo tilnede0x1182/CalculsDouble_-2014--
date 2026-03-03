@@ -1,6 +1,6 @@
 # CalculsDouble
 
-Calculatrice Java avec calculs exacts sur les décimaux. Les nombres sont stockés sous forme de chaînes de caractères, permettant des calculs sans perte de précision.
+Librairie de calculs en Java avec calculs exacts sur les décimaux. Les nombres sont stockés sous forme de chaînes de caractères, permettant des calculs sans perte de précision.
 
 ## Prérequis
 
